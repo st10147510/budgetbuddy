@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.google.services)
 }
 
 android {
@@ -26,7 +25,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
-            isTestCoverageEnabled = true
+            enableUnitTestCoverage = true
         }
     }
 
@@ -50,10 +49,6 @@ android {
             isReturnDefaultValues = true
         }
     }
-}
-
-repositories {
-    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -82,11 +77,6 @@ dependencies {
     implementation(libs.hilt.navigation.fragment)
     implementation(libs.androidx.hilt.work)
     kapt(libs.androidx.hilt.compiler)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.analytics.ktx)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)

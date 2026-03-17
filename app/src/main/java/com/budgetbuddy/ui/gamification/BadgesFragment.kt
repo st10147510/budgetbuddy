@@ -11,9 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.data.local.entities.BadgeType
 import com.budgetbuddy.databinding.FragmentBadgesBinding
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -29,7 +29,7 @@ class BadgesFragment : Fragment() {
 
     private val viewModel: BadgesViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentBadgesBinding.inflate(inflater, container, false)
@@ -38,24 +38,19 @@ class BadgesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
         binding.rvBadges.layoutManager = LinearLayoutManager(requireContext())
 
-        val userId = auth.currentUser?.uid ?: return
+        val userId = session.userId ?: return
         viewModel.loadBadges(userId)
 
         val fmt = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.badges.collect { badges ->
                     val items = badges.map { badge ->
-                        BadgeItem(
-                            icon = badgeIcon(badge.badgeType),
-                            name = badgeName(badge.badgeType),
-                            earnedOn = "Earned ${fmt.format(Date(badge.earnedAt))}"
-                        )
+                        BadgeItem(badgeIcon(badge.badgeType), badgeName(badge.badgeType),
+                            "Earned ${fmt.format(Date(badge.earnedAt))}")
                     }
                     binding.rvBadges.adapter = BadgeAdapter(items)
                 }
@@ -64,27 +59,24 @@ class BadgesFragment : Fragment() {
     }
 
     private fun badgeIcon(type: BadgeType) = when (type) {
-        BadgeType.FIRST_STEP -> "🎯"
+        BadgeType.FIRST_STEP    -> "🎯"
         BadgeType.DAILY_TRACKER -> "🔥"
         BadgeType.PERFECT_MONTH -> "📅"
         BadgeType.BUDGET_MASTER -> "💰"
-        BadgeType.DEBT_SLAYER -> "⚔️"
-        BadgeType.GOAL_GETTER -> "🏆"
+        BadgeType.DEBT_SLAYER   -> "⚔️"
+        BadgeType.GOAL_GETTER   -> "🏆"
         BadgeType.THRIFTY_CHAMP -> "💎"
     }
 
     private fun badgeName(type: BadgeType) = when (type) {
-        BadgeType.FIRST_STEP -> "First Step"
+        BadgeType.FIRST_STEP    -> "First Step"
         BadgeType.DAILY_TRACKER -> "Daily Tracker"
         BadgeType.PERFECT_MONTH -> "Perfect Month"
         BadgeType.BUDGET_MASTER -> "Budget Master"
-        BadgeType.DEBT_SLAYER -> "Debt Slayer"
-        BadgeType.GOAL_GETTER -> "Goal Getter"
+        BadgeType.DEBT_SLAYER   -> "Debt Slayer"
+        BadgeType.GOAL_GETTER   -> "Goal Getter"
         BadgeType.THRIFTY_CHAMP -> "Thrifty Champ"
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

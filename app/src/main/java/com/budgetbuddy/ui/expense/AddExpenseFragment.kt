@@ -17,11 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.budgetbuddy.R
+import com.budgetbuddy.data.local.SessionManager
+import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.databinding.FragmentAddExpenseBinding
 import com.budgetbuddy.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
@@ -36,25 +37,18 @@ class AddExpenseFragment : Fragment() {
 
     private val viewModel: ExpenseViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
 
     private var selectedDate = System.currentTimeMillis()
     private var receiptUri: Uri? = null
     private var isIncome = false
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) {
-            binding.ivReceiptPreview.setImageURI(receiptUri)
-            binding.ivReceiptPreview.visibility = View.VISIBLE
-        }
+        if (success) { binding.ivReceiptPreview.setImageURI(receiptUri); binding.ivReceiptPreview.visibility = View.VISIBLE }
     }
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            receiptUri = it
-            binding.ivReceiptPreview.setImageURI(it)
-            binding.ivReceiptPreview.visibility = View.VISIBLE
-        }
+        uri?.let { receiptUri = it; binding.ivReceiptPreview.setImageURI(it); binding.ivReceiptPreview.visibility = View.VISIBLE }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -64,9 +58,7 @@ class AddExpenseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
-
         updateDateDisplay()
         binding.etDate.setOnClickListener { showDatePicker() }
         binding.tilDate.setEndIconOnClickListener { showDatePicker() }
@@ -83,8 +75,9 @@ class AddExpenseFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.categories.collect { categories ->
                     val names = categories.map { "${it.icon} ${it.name}" }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
-                    binding.actvCategory.setAdapter(adapter)
+                    binding.actvCategory.setAdapter(
+                        ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
+                    )
                 }
             }
         }
@@ -96,16 +89,10 @@ class AddExpenseFragment : Fragment() {
         val amount = binding.etAmount.text.toString().toDoubleOrNull()
         val categoryText = binding.actvCategory.text.toString()
         val notes = binding.etNotes.text.toString().takeIf { it.isNotBlank() }
-        val userId = auth.currentUser?.uid ?: return
+        val userId = session.userId ?: return
 
-        if (amount == null || amount <= 0) {
-            binding.tilAmount.error = getString(R.string.error_invalid_amount)
-            return
-        }
-        if (categoryText.isBlank()) {
-            binding.tilCategory.error = getString(R.string.error_select_category)
-            return
-        }
+        if (amount == null || amount <= 0) { binding.tilAmount.error = getString(R.string.error_invalid_amount); return }
+        if (categoryText.isBlank()) { binding.tilCategory.error = getString(R.string.error_select_category); return }
 
         val categories = viewModel.categories.value
         val categoryName = categoryText.substringAfter(" ").trim()
@@ -117,7 +104,8 @@ class AddExpenseFragment : Fragment() {
             categoryId = category.id,
             date = selectedDate,
             notes = notes,
-            receiptPath = receiptUri?.toString()
+            receiptPath = receiptUri?.toString(),
+            type = if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE
         )
         Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_SHORT).show()
         findNavController().navigateUp()
@@ -126,36 +114,26 @@ class AddExpenseFragment : Fragment() {
     private fun showDatePicker() {
         val cal = Calendar.getInstance().apply { timeInMillis = selectedDate }
         DatePickerDialog(requireContext(), { _, year, month, day ->
-            cal.set(year, month, day)
-            selectedDate = cal.timeInMillis
-            updateDateDisplay()
+            cal.set(year, month, day); selectedDate = cal.timeInMillis; updateDateDisplay()
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
     }
 
-    private fun updateDateDisplay() {
-        binding.etDate.setText(DateUtils.formatDate(selectedDate))
-    }
+    private fun updateDateDisplay() { binding.etDate.setText(DateUtils.formatDate(selectedDate)) }
 
     private fun showReceiptOptions() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.attach_receipt))
             .setItems(arrayOf(getString(R.string.take_photo), getString(R.string.choose_gallery))) { _, which ->
                 if (which == 0) launchCamera() else pickImage.launch("image/*")
-            }
-            .show()
+            }.show()
     }
 
     private fun launchCamera() {
         val imgFile = File(requireContext().filesDir, "receipts/receipt_${System.currentTimeMillis()}.jpg")
             .also { it.parentFile?.mkdirs() }
-        receiptUri = FileProvider.getUriForFile(
-            requireContext(), "${requireContext().packageName}.fileprovider", imgFile
-        )
+        receiptUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", imgFile)
         takePicture.launch(receiptUri)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

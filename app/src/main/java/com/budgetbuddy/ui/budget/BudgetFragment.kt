@@ -11,13 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.budgetbuddy.R
+import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.data.local.entities.CategoryEntity
-import com.budgetbuddy.databinding.FragmentBudgetBinding
 import com.budgetbuddy.data.repository.CategoryRepository
+import com.budgetbuddy.databinding.FragmentBudgetBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -31,12 +31,10 @@ class BudgetFragment : Fragment() {
 
     private val viewModel: BudgetViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
     @Inject lateinit var categoryRepository: CategoryRepository
 
-    private val adapter = BudgetAdapter { budget ->
-        viewModel.deleteBudget(budget.budget)
-    }
+    private val adapter = BudgetAdapter { viewModel.deleteBudget(it.budget) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentBudgetBinding.inflate(inflater, container, false)
@@ -45,11 +43,10 @@ class BudgetFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.rvBudgets.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBudgets.adapter = adapter
 
-        val userId = auth.currentUser?.uid ?: return
+        val userId = session.userId ?: return
         viewModel.loadBudgets(userId)
 
         binding.fabAddBudget.setOnClickListener { showAddBudgetDialog(userId) }
@@ -58,10 +55,8 @@ class BudgetFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.budgetsWithSpend.collect { budgets ->
                     adapter.submitList(budgets)
-                    binding.tvEmptyState.visibility =
-                        if (budgets.isEmpty()) View.VISIBLE else View.GONE
-                    binding.rvBudgets.visibility =
-                        if (budgets.isEmpty()) View.GONE else View.VISIBLE
+                    binding.tvEmptyState.visibility = if (budgets.isEmpty()) View.VISIBLE else View.GONE
+                    binding.rvBudgets.visibility = if (budgets.isEmpty()) View.GONE else View.VISIBLE
                 }
             }
         }
@@ -71,21 +66,13 @@ class BudgetFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val categories = categoryRepository.getAllCategories().first()
             if (categories.isEmpty()) return@launch
-
-            var selectedCategory: CategoryEntity = categories[0]
-            val categoryNames = categories.map { "${it.icon} ${it.name}" }.toTypedArray()
-
-            val dialogView = layoutInflater.inflate(android.R.layout.simple_list_item_1, null)
-            // Simple dialog with category picker and amount
+            var selected: CategoryEntity = categories[0]
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Set Budget")
-                .setSingleChoiceItems(categoryNames, 0) { _, which ->
-                    selectedCategory = categories[which]
+                .setSingleChoiceItems(categories.map { "${it.icon} ${it.name}" }.toTypedArray(), 0) { _, i ->
+                    selected = categories[i]
                 }
-                .setPositiveButton(R.string.save) { _, _ ->
-                    // Show amount input
-                    showAmountDialog(userId, selectedCategory)
-                }
+                .setPositiveButton(R.string.save) { _, _ -> showAmountDialog(userId, selected) }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
         }
@@ -93,13 +80,10 @@ class BudgetFragment : Fragment() {
 
     private fun showAmountDialog(userId: String, category: CategoryEntity) {
         val input = TextInputEditText(requireContext()).apply {
-            hint = getString(R.string.budget_limit)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
         val container = TextInputLayout(requireContext()).apply {
-            prefixText = "R "
-            addView(input)
-            setPadding(48, 16, 48, 8)
+            prefixText = "R "; hint = getString(R.string.budget_limit); addView(input); setPadding(48, 16, 48, 8)
         }
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("${category.icon} ${category.name}")
@@ -112,8 +96,5 @@ class BudgetFragment : Fragment() {
             .show()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

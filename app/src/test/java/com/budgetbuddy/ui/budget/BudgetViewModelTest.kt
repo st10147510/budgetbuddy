@@ -61,6 +61,7 @@ class BudgetViewModelTest {
             .thenReturn(500.0) // 50% — OK
 
         viewModel.budgetsWithSpend.test {
+            skipItems(1) // skip initial emptyList
             viewModel.loadBudgets("user1")
             val result = awaitItem()
             assertEquals(1, result.size)
@@ -80,6 +81,7 @@ class BudgetViewModelTest {
             .thenReturn(850.0) // 85%
 
         viewModel.budgetsWithSpend.test {
+            skipItems(1)
             viewModel.loadBudgets("user1")
             val result = awaitItem()
             assertEquals(BudgetStatus.WARNING, result[0].status)
@@ -97,6 +99,7 @@ class BudgetViewModelTest {
             .thenReturn(1100.0) // 110% — exceeded
 
         viewModel.budgetsWithSpend.test {
+            skipItems(1)
             viewModel.loadBudgets("user1")
             val result = awaitItem()
             assertEquals(BudgetStatus.EXCEEDED, result[0].status)
@@ -111,12 +114,9 @@ class BudgetViewModelTest {
             .thenReturn(flowOf(listOf(budget)))
         whenever(categoryRepository.getCategoryById(1L)).thenReturn(null) // missing category
 
-        viewModel.budgetsWithSpend.test {
-            viewModel.loadBudgets("user1")
-            val result = awaitItem()
-            assertTrue(result.isEmpty())
-            cancelAndIgnoreRemainingEvents()
-        }
+        viewModel.loadBudgets("user1")
+        advanceUntilIdle()
+        assertTrue(viewModel.budgetsWithSpend.value.isEmpty())
     }
 
     @Test
@@ -144,6 +144,7 @@ class BudgetViewModelTest {
             .thenReturn(5000.0) // 500%
 
         viewModel.budgetsWithSpend.test {
+            skipItems(1)
             viewModel.loadBudgets("user1")
             val result = awaitItem()
             assertEquals(150, result[0].progressPercent)

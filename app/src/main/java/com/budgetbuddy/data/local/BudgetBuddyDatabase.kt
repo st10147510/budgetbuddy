@@ -9,6 +9,7 @@ import com.budgetbuddy.util.Converters
 
 @Database(
     entities = [
+        UserEntity::class,
         CategoryEntity::class,
         TransactionEntity::class,
         BudgetEntity::class,
@@ -17,12 +18,13 @@ import com.budgetbuddy.util.Converters
         BadgeEntity::class,
         NotificationRuleEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class BudgetBuddyDatabase : RoomDatabase() {
 
+    abstract fun userDao(): UserDao
     abstract fun categoryDao(): CategoryDao
     abstract fun transactionDao(): TransactionDao
     abstract fun budgetDao(): BudgetDao

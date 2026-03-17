@@ -10,11 +10,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentReportsBinding
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +27,7 @@ class ReportsFragment : Fragment() {
 
     private val viewModel: ReportsViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentReportsBinding.inflate(inflater, container, false)
@@ -36,10 +36,9 @@ class ReportsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupCharts()
 
-        setupPieChart()
-
-        val userId = auth.currentUser?.uid ?: return
+        val userId = session.userId ?: return
         viewModel.loadReports(userId)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -53,7 +52,7 @@ class ReportsFragment : Fragment() {
         }
     }
 
-    private fun setupPieChart() {
+    private fun setupCharts() {
         binding.pieChart.apply {
             description.isEnabled = false
             isDrawHoleEnabled = true
@@ -71,26 +70,13 @@ class ReportsFragment : Fragment() {
     }
 
     private fun updatePieChart(spends: List<CategorySpend>) {
-        if (spends.isEmpty()) {
-            binding.pieChart.setNoDataText("No expenses this month")
-            binding.pieChart.invalidate()
-            return
-        }
+        if (spends.isEmpty()) { binding.pieChart.setNoDataText("No expenses this month"); binding.pieChart.invalidate(); return }
         val entries = spends.map { PieEntry(it.amount.toFloat(), it.name) }
-        val colors = spends.map {
-            try { Color.parseColor(it.colorHex) } catch (e: Exception) { Color.GRAY }
-        }
-        val dataSet = PieDataSet(entries, "").apply {
-            this.colors = colors
-            valueTextColor = Color.WHITE
-            valueTextSize = 11f
-        }
+        val colors = spends.map { try { Color.parseColor(it.colorHex) } catch (e: Exception) { Color.GRAY } }
+        val dataSet = PieDataSet(entries, "").apply { this.colors = colors; valueTextColor = Color.WHITE; valueTextSize = 11f }
         binding.pieChart.data = PieData(dataSet)
         binding.pieChart.invalidate()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

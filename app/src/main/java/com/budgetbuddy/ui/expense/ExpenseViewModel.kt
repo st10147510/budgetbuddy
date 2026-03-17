@@ -51,6 +51,7 @@ class ExpenseViewModel @Inject constructor(
         date: Long,
         notes: String?,
         receiptPath: String?,
+        type: TransactionType = TransactionType.EXPENSE,
         existingId: Long = -1
     ) {
         if (amount <= 0) { _uiState.value = ExpenseUiState.Error("Please enter a valid amount"); return }
@@ -67,7 +68,7 @@ class ExpenseViewModel @Inject constructor(
                     date = date,
                     notes = notes?.takeIf { it.isNotBlank() },
                     receiptImagePath = receiptPath,
-                    type = TransactionType.EXPENSE
+                    type = type
                 )
                 if (existingId > 0) transactionRepository.updateTransaction(transaction)
                 else transactionRepository.insertTransaction(transaction)

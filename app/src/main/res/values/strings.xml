@@ -122,6 +122,9 @@
     <string name="debt_management">Debt Management</string>
     <string name="no_debts">No debts added yet.\nTap + to track one.</string>
 
+    <!-- Categories -->
+    <string name="categories">Categories</string>
+
     <!-- Errors -->
     <string name="error_empty_email">Please enter your email address</string>
     <string name="error_invalid_email">Please enter a valid email address</string>

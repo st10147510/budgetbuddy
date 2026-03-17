@@ -53,6 +53,7 @@ class ExpenseViewModelTest {
     @Test
     fun `saveExpense with invalid amount emits Error`() = runTest {
         viewModel.uiState.test {
+            skipItems(1) // skip initial Idle
             viewModel.saveExpense("user1", -10.0, 1L, System.currentTimeMillis(), null, null)
             val state = awaitItem()
             assertTrue(state is ExpenseUiState.Error)
@@ -62,6 +63,7 @@ class ExpenseViewModelTest {
     @Test
     fun `saveExpense with invalid categoryId emits Error`() = runTest {
         viewModel.uiState.test {
+            skipItems(1)
             viewModel.saveExpense("user1", 100.0, -1L, System.currentTimeMillis(), null, null)
             val state = awaitItem()
             assertTrue(state is ExpenseUiState.Error)
@@ -72,14 +74,9 @@ class ExpenseViewModelTest {
     fun `saveExpense success emits Saved and checks badges`() = runTest {
         whenever(transactionRepository.insertTransaction(any())).thenReturn(1L)
 
-        viewModel.uiState.test {
-            viewModel.saveExpense("user1", 100.0, 1L, System.currentTimeMillis(), "Lunch", null)
-            skipItems(1) // Loading
-            val state = awaitItem()
-            assertTrue(state is ExpenseUiState.Saved)
-        }
-
+        viewModel.saveExpense("user1", 100.0, 1L, System.currentTimeMillis(), "Lunch", null)
         advanceUntilIdle()
+        assertTrue(viewModel.uiState.value is ExpenseUiState.Saved)
         verify(badgeRepository).checkAndAwardBadges("user1")
     }
 
@@ -88,13 +85,9 @@ class ExpenseViewModelTest {
         val tx = TransactionEntity(id = 1L, userId = "user1", amount = 100.0,
             categoryId = 1L, date = System.currentTimeMillis(), type = TransactionType.EXPENSE)
 
-        viewModel.uiState.test {
-            viewModel.deleteExpense(tx)
-            skipItems(1) // Loading
-            val state = awaitItem()
-            assertTrue(state is ExpenseUiState.Deleted)
-        }
-
+        viewModel.deleteExpense(tx)
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value is ExpenseUiState.Deleted)
         verify(transactionRepository).deleteTransaction(tx)
     }
 

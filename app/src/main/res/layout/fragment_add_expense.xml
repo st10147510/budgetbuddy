@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             app:tabBackground="@color/surface"
             app:tabSelectedTextColor="@color/purple_primary"
-            app:tabUnselectedTextColor="@color/text_secondary"
+            app:tabTextColor="@color/text_secondary"
             app:tabIndicatorColor="@color/purple_primary"
             android:layout_marginBottom="24dp">
             <com.google.android.material.tabs.TabItem

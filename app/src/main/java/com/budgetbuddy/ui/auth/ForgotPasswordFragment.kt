@@ -31,7 +31,7 @@ class ForgotPasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.btnSendReset.setOnClickListener {
+        binding.btnResetPassword.setOnClickListener {
             viewModel.sendPasswordReset(binding.etEmail.text.toString().trim())
         }
 

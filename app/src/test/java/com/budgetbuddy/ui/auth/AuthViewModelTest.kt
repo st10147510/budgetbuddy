@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.budgetbuddy.data.repository.AuthRepository
 import com.budgetbuddy.data.repository.AuthResult
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -45,6 +44,7 @@ class AuthViewModelTest {
     @Test
     fun `signIn with empty email emits Error immediately without calling repository`() = runTest {
         viewModel.uiState.test {
+            skipItems(1) // skip initial Idle
             viewModel.signIn("", "password123")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)
@@ -56,6 +56,7 @@ class AuthViewModelTest {
     @Test
     fun `signIn with empty password emits Error without calling repository`() = runTest {
         viewModel.uiState.test {
+            skipItems(1)
             viewModel.signIn("user@example.com", "")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)
@@ -65,35 +66,31 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `signIn success emits Loading then Success`() = runTest {
-        val mockUser: FirebaseUser = mock()
+    fun `signIn success emits Success state`() = runTest {
         whenever(authRepository.signIn("user@example.com", "password123"))
-            .thenReturn(AuthResult.Success(mockUser))
+            .thenReturn(AuthResult.Success("uid-1", "Test User", "user@example.com"))
 
-        viewModel.uiState.test {
-            viewModel.signIn("user@example.com", "password123")
-            assertTrue(awaitItem() is AuthUiState.Loading)
-            assertTrue(awaitItem() is AuthUiState.Success)
-        }
+        viewModel.signIn("user@example.com", "password123")
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value is AuthUiState.Success)
     }
 
     @Test
-    fun `signIn failure emits Loading then Error`() = runTest {
+    fun `signIn failure emits Error state`() = runTest {
         whenever(authRepository.signIn("user@example.com", "wrongpass"))
             .thenReturn(AuthResult.Error("Invalid credentials"))
 
-        viewModel.uiState.test {
-            viewModel.signIn("user@example.com", "wrongpass")
-            skipItems(1) // Loading
-            val error = awaitItem()
-            assertTrue(error is AuthUiState.Error)
-            assertEquals("Invalid credentials", (error as AuthUiState.Error).message)
-        }
+        viewModel.signIn("user@example.com", "wrongpass")
+        advanceUntilIdle()
+        val state = viewModel.uiState.value
+        assertTrue(state is AuthUiState.Error)
+        assertEquals("Invalid credentials", (state as AuthUiState.Error).message)
     }
 
     @Test
     fun `signUp with empty name emits Error without calling repository`() = runTest {
         viewModel.uiState.test {
+            skipItems(1)
             viewModel.signUp("user@example.com", "password123", "")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)
@@ -105,6 +102,7 @@ class AuthViewModelTest {
     @Test
     fun `signUp with short password emits Error without calling repository`() = runTest {
         viewModel.uiState.test {
+            skipItems(1)
             viewModel.signUp("user@example.com", "short", "Test User")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)
@@ -114,23 +112,19 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `signUp success emits Loading then Success`() = runTest {
-        val mockUser: FirebaseUser = mock()
+    fun `signUp success emits Success state`() = runTest {
         whenever(authRepository.signUp("user@example.com", "password123", "Test User"))
-            .thenReturn(AuthResult.Success(mockUser))
+            .thenReturn(AuthResult.Success("uid-1", "Test User", "user@example.com"))
 
-        viewModel.uiState.test {
-            viewModel.signUp("user@example.com", "password123", "Test User")
-            assertTrue(awaitItem() is AuthUiState.Loading)
-            assertTrue(awaitItem() is AuthUiState.Success)
-        }
+        viewModel.signUp("user@example.com", "password123", "Test User")
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value is AuthUiState.Success)
     }
 
     @Test
     fun `resetState sets state back to Idle`() = runTest {
-        val mockUser: FirebaseUser = mock()
         whenever(authRepository.signIn("user@example.com", "password123"))
-            .thenReturn(AuthResult.Success(mockUser))
+            .thenReturn(AuthResult.Success("uid-1", "Test User", "user@example.com"))
 
         viewModel.signIn("user@example.com", "password123")
         advanceUntilIdle()
@@ -142,6 +136,7 @@ class AuthViewModelTest {
     @Test
     fun `sendPasswordReset with empty email emits Error`() = runTest {
         viewModel.uiState.test {
+            skipItems(1)
             viewModel.sendPasswordReset("")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)

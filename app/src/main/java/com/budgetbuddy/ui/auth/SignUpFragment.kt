@@ -36,10 +36,9 @@ class SignUpFragment : Fragment() {
             viewModel.signUp(
                 email = binding.etEmail.text.toString().trim(),
                 password = binding.etPassword.text.toString(),
-                displayName = binding.etFullName.text.toString().trim()
+                displayName = binding.etDisplayName.text.toString().trim()
             )
         }
-        binding.tvSignIn.setOnClickListener { findNavController().navigate(R.id.action_signUp_to_signIn) }
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

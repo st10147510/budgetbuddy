@@ -25,10 +25,10 @@ object DatabaseModule {
     fun provideDatabase(@ApplicationContext context: Context): BudgetBuddyDatabase {
         var db: BudgetBuddyDatabase? = null
         db = Room.databaseBuilder(context, BudgetBuddyDatabase::class.java, BudgetBuddyDatabase.DATABASE_NAME)
+            .fallbackToDestructiveMigration()
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(sqLiteDatabase: SupportSQLiteDatabase) {
                     super.onCreate(sqLiteDatabase)
-                    // Seed default categories
                     CoroutineScope(Dispatchers.IO).launch {
                         db?.categoryDao()?.insertCategories(BudgetBuddyDatabase.DEFAULT_CATEGORIES)
                     }
@@ -38,6 +38,7 @@ object DatabaseModule {
         return db
     }
 
+    @Provides fun provideUserDao(db: BudgetBuddyDatabase): UserDao = db.userDao()
     @Provides fun provideCategoryDao(db: BudgetBuddyDatabase): CategoryDao = db.categoryDao()
     @Provides fun provideTransactionDao(db: BudgetBuddyDatabase): TransactionDao = db.transactionDao()
     @Provides fun provideBudgetDao(db: BudgetBuddyDatabase): BudgetDao = db.budgetDao()

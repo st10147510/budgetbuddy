@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,11 +13,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.budgetbuddy.R
+import com.budgetbuddy.data.local.SessionManager
+import com.budgetbuddy.data.local.entities.GoalEntity
 import com.budgetbuddy.databinding.FragmentGoalsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +31,7 @@ class GoalsFragment : Fragment() {
 
     private val viewModel: GoalsViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
 
     private val adapter = GoalAdapter(
         onAddSavings = { goal -> showAddSavingsDialog(goal) },
@@ -43,11 +45,10 @@ class GoalsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.rvGoals.layoutManager = LinearLayoutManager(requireContext())
         binding.rvGoals.adapter = adapter
 
-        val userId = auth.currentUser?.uid ?: return
+        val userId = session.userId ?: return
         viewModel.loadGoals(userId)
 
         binding.fabAddGoal.setOnClickListener { showAddGoalDialog(userId) }
@@ -70,47 +71,35 @@ class GoalsFragment : Fragment() {
             hint = getString(R.string.target_amount)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
-        val container = android.widget.LinearLayout(requireContext()).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            setPadding(48, 16, 48, 8)
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL; setPadding(48, 16, 48, 8)
             addView(TextInputLayout(requireContext()).apply { addView(nameInput) })
             addView(TextInputLayout(requireContext()).apply { prefixText = "R "; addView(amountInput) })
         }
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.add_goal))
-            .setView(container)
+            .setTitle(getString(R.string.add_goal)).setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
                 val name = nameInput.text.toString().trim()
                 val amount = amountInput.text.toString().toDoubleOrNull() ?: 0.0
                 if (name.isNotEmpty() && amount > 0) viewModel.saveGoal(userId, name, amount)
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+            .setNegativeButton(R.string.cancel, null).show()
     }
 
-    private fun showAddSavingsDialog(goal: com.budgetbuddy.data.local.entities.GoalEntity) {
+    private fun showAddSavingsDialog(goal: GoalEntity) {
         val input = TextInputEditText(requireContext()).apply {
             hint = getString(R.string.saved_amount)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
-        val container = TextInputLayout(requireContext()).apply {
-            prefixText = "R "
-            addView(input)
-            setPadding(48, 16, 48, 8)
-        }
+        val container = TextInputLayout(requireContext()).apply { prefixText = "R "; addView(input); setPadding(48, 16, 48, 8) }
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Add savings to: ${goal.name}")
-            .setView(container)
+            .setTitle("Add savings to: ${goal.name}").setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
                 val amount = input.text.toString().toDoubleOrNull() ?: 0.0
                 if (amount > 0) viewModel.updateSaved(goal, amount)
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+            .setNegativeButton(R.string.cancel, null).show()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

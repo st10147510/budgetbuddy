@@ -32,14 +32,16 @@ class SignInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnBack.setOnClickListener { findNavController().navigateUp() }
         binding.btnSignIn.setOnClickListener {
             viewModel.signIn(
                 binding.etEmail.text.toString().trim(),
                 binding.etPassword.text.toString()
             )
         }
-        binding.tvSignUp.setOnClickListener { findNavController().navigate(R.id.action_signIn_to_signUp) }
-        binding.tvForgotPassword.setOnClickListener { findNavController().navigate(R.id.action_signIn_to_forgotPassword) }
+        binding.tvForgotPassword.setOnClickListener {
+            findNavController().navigate(R.id.action_signIn_to_forgotPassword)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -48,7 +50,10 @@ class SignInFragment : Fragment() {
                     binding.btnSignIn.isEnabled = state !is AuthUiState.Loading
                     when (state) {
                         is AuthUiState.Success -> findNavController().navigate(R.id.action_signIn_to_home)
-                        is AuthUiState.Error -> { Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show(); viewModel.resetState() }
+                        is AuthUiState.Error   -> {
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                            viewModel.resetState()
+                        }
                         else -> Unit
                     }
                 }

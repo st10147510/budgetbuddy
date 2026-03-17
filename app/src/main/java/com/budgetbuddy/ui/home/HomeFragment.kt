@@ -12,10 +12,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.budgetbuddy.R
+import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentHomeBinding
 import com.budgetbuddy.ui.expense.TransactionAdapter
-import com.budgetbuddy.util.DateUtils
-import com.google.firebase.auth.FirebaseAuth
+import com.budgetbuddy.ui.expense.TransactionWithCategory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -31,7 +31,7 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
 
     private val adapter = TransactionAdapter()
 
@@ -46,35 +46,23 @@ class HomeFragment : Fragment() {
         binding.rvTransactions.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTransactions.adapter = adapter
 
-        val user = auth.currentUser
-        binding.tvUserName.text = user?.displayName ?: user?.email?.substringBefore('@') ?: "User"
+        binding.tvUserName.text = session.displayName ?: session.email?.substringBefore('@') ?: "User"
         binding.tvMonth.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(Date())
 
-        binding.btnAddExpense.setOnClickListener {
-            findNavController().navigate(R.id.addExpenseFragment)
-        }
+        binding.btnAddExpense.setOnClickListener { findNavController().navigate(R.id.addExpenseFragment) }
+        binding.tvSeeAll.setOnClickListener { findNavController().navigate(R.id.transactionListFragment) }
 
-        binding.tvSeeAll.setOnClickListener {
-            findNavController().navigate(R.id.transactionListFragment)
-        }
-
-        user?.uid?.let { uid ->
-            viewModel.init(uid)
-        }
+        val userId = session.userId ?: return
+        viewModel.init(userId)
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     binding.tvMonthlyTotal.text = "R %.2f".format(state.totalSpendThisMonth)
-                    val categories = viewModel.categories.value
-                    val catMap = categories.associateBy { it.id }
+                    val catMap = viewModel.categories.value.associateBy { it.id }
                     val items = state.recentTransactions.map { tx ->
                         val cat = catMap[tx.categoryId]
-                        com.budgetbuddy.ui.expense.TransactionWithCategory(
-                            transaction = tx,
-                            categoryName = cat?.name ?: "Other",
-                            categoryIcon = cat?.icon ?: "📦"
-                        )
+                        TransactionWithCategory(tx, cat?.name ?: "Other", cat?.icon ?: "📦")
                     }
                     adapter.submitList(items)
                     binding.tvEmptyState.visibility =
@@ -84,8 +72,5 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

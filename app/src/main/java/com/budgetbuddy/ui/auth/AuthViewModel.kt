@@ -27,7 +27,7 @@ class AuthViewModel @Inject constructor(
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     val isLoggedIn: Boolean get() = authRepository.isLoggedIn
-    val currentUserId: String get() = authRepository.currentUser?.uid ?: ""
+    val currentUserId: String get() = authRepository.currentUserId ?: ""
 
     fun signIn(email: String, password: String) {
         if (!validateSignIn(email, password)) return
@@ -35,7 +35,7 @@ class AuthViewModel @Inject constructor(
             _uiState.value = AuthUiState.Loading
             _uiState.value = when (val result = authRepository.signIn(email, password)) {
                 is AuthResult.Success -> AuthUiState.Success
-                is AuthResult.Error -> AuthUiState.Error(result.message)
+                is AuthResult.Error   -> AuthUiState.Error(result.message)
             }
         }
     }
@@ -46,7 +46,7 @@ class AuthViewModel @Inject constructor(
             _uiState.value = AuthUiState.Loading
             _uiState.value = when (val result = authRepository.signUp(email, password, displayName)) {
                 is AuthResult.Success -> AuthUiState.Success
-                is AuthResult.Error -> AuthUiState.Error(result.message)
+                is AuthResult.Error   -> AuthUiState.Error(result.message)
             }
         }
     }
@@ -71,8 +71,8 @@ class AuthViewModel @Inject constructor(
 
     private fun validateSignIn(email: String, password: String): Boolean {
         return when {
-            email.isBlank() -> { _uiState.value = AuthUiState.Error("Please enter your email address"); false }
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> { _uiState.value = AuthUiState.Error("Please enter a valid email address"); false }
+            email.isBlank()    -> { _uiState.value = AuthUiState.Error("Please enter your email address"); false }
+            !isValidEmail(email) -> { _uiState.value = AuthUiState.Error("Please enter a valid email address"); false }
             password.isBlank() -> { _uiState.value = AuthUiState.Error("Please enter your password"); false }
             else -> true
         }
@@ -80,11 +80,14 @@ class AuthViewModel @Inject constructor(
 
     private fun validateSignUp(email: String, password: String, name: String): Boolean {
         return when {
-            name.isBlank() -> { _uiState.value = AuthUiState.Error("Please enter your full name"); false }
-            email.isBlank() -> { _uiState.value = AuthUiState.Error("Please enter your email address"); false }
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> { _uiState.value = AuthUiState.Error("Please enter a valid email address"); false }
-            password.length < 8 -> { _uiState.value = AuthUiState.Error("Password must be at least 8 characters"); false }
+            name.isBlank()       -> { _uiState.value = AuthUiState.Error("Please enter your full name"); false }
+            email.isBlank()      -> { _uiState.value = AuthUiState.Error("Please enter your email address"); false }
+            !isValidEmail(email) -> { _uiState.value = AuthUiState.Error("Please enter a valid email address"); false }
+            password.length < 8  -> { _uiState.value = AuthUiState.Error("Password must be at least 8 characters"); false }
             else -> true
         }
     }
+
+    private fun isValidEmail(email: String): Boolean =
+        Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$").matches(email)
 }

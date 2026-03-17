@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.budgetbuddy.R
+import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentProfileBinding
 import com.budgetbuddy.ui.auth.AuthViewModel
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ class ProfileFragment : Fragment() {
 
     private val authViewModel: AuthViewModel by viewModels()
 
-    @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var session: SessionManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -31,22 +31,12 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.tvDisplayName.text = session.displayName ?: "User"
+        binding.tvEmail.text = session.email ?: ""
 
-        val user = auth.currentUser
-        binding.tvDisplayName.text = user?.displayName ?: user?.email?.substringBefore('@') ?: "User"
-        binding.tvEmail.text = user?.email ?: ""
-
-        binding.tvCategories.setOnClickListener {
-            findNavController().navigate(R.id.categoriesFragment)
-        }
-
-        binding.tvBadges.setOnClickListener {
-            findNavController().navigate(R.id.badgesFragment)
-        }
-
-        binding.tvNotifications.setOnClickListener {
-            // Future: notifications settings
-        }
+        binding.tvCategories.setOnClickListener { findNavController().navigate(R.id.categoriesFragment) }
+        binding.tvBadges.setOnClickListener { findNavController().navigate(R.id.badgesFragment) }
+        binding.tvNotifications.setOnClickListener { /* future */ }
 
         binding.btnSignOut.setOnClickListener {
             authViewModel.signOut()
@@ -54,8 +44,5 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
