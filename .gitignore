@@ -1,0 +1,29 @@
+# Claude                                                    
+CLAUDE.md                                                                                                                                                                         
+.claude/    
+
+# Copilot
+.copilot/
+
+# VSCode
+.vscode/
+
+# Kotlin
+.idea/
+*.orig 
+
+# Google Services (do not commit credentials)                                                                                                                        
+app/google-services.json  
+
+# Docs                                                                                                                                                                            
+docs/
+
+# Android / Gradle build artifacts                                                                                                                                   
+*.iml                                                                                                                                                                
+.gradle/                                                                                                                                                             
+build/                                                                                                                                                               
+local.properties                                                                                                                                                     
+*.DS_Store                                                                                                                                                           
+captures/                                                                                                                                                            
+.externalNativeBuild/                                                                                                                                                
+.cxx/  

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="purple_primary">#6B4EFF</color>
+    <color name="purple_dark">#4B31CC</color>
+    <color name="teal_accent">#00D4AA</color>
+
+    <!-- Dark theme backgrounds -->
+    <color name="background">#0F0F1A</color>
+    <color name="surface">#1A1A2E</color>
+    <color name="surface_variant">#252540</color>
+    <color name="on_surface">#FFFFFF</color>
+    <color name="on_surface_secondary">#9E9EBF</color>
+
+    <!-- Status colors -->
+    <color name="green_ok">#4CAF50</color>
+    <color name="amber_warning">#FF9800</color>
+    <color name="red_danger">#F44336</color>
+
+    <!-- Category colors -->
+    <color name="cat_food">#4CAF50</color>
+    <color name="cat_transport">#2196F3</color>
+    <color name="cat_entertainment">#9C27B0</color>
+    <color name="cat_health">#F44336</color>
+    <color name="cat_utilities">#FF9800</color>
+    <color name="cat_housing">#795548</color>
+    <color name="cat_education">#00BCD4</color>
+    <color name="cat_clothing">#E91E63</color>
+    <color name="cat_savings">#8BC34A</color>
+    <color name="cat_other">#607D8B</color>
+
+    <!-- Semantic aliases used in layouts -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#9E9EBF</color>
+    <color name="accent_teal">#00D4AA</color>
+    <color name="expense_red">#F44336</color>
+    <color name="income_green">#4CAF50</color>
+
+    <!-- Common -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="divider">#1EFFFFFF</color>
+</resources>
