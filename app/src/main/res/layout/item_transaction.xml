@@ -1,67 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/surface"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    android:layout_marginBottom="8dp">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="14dp"
+    android:paddingHorizontal="4dp">
 
+    <!-- Category icon circle -->
+    <TextView
+        android:id="@+id/tvCategoryIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:background="@drawable/bg_icon_circle_dark"
+        android:layout_marginEnd="14dp"/>
+
+    <!-- Name + notes -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvCategoryIcon"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:gravity="center"
-            android:textSize="22sp"
-            android:background="@drawable/bg_circle"
-            android:layout_marginEnd="12dp"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/tvCategoryName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary_dark"/>
 
-            <TextView
-                android:id="@+id/tvCategoryName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"/>
+        <TextView
+            android:id="@+id/tvNotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary_dark"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvNotes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/text_secondary"
-                android:maxLines="1"
-                android:ellipsize="end"/>
-
-            <TextView
-                android:id="@+id/tvDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:textColor="@color/text_secondary"/>
-        </LinearLayout>
+    <!-- Amount + date -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end">
 
         <TextView
             android:id="@+id/tvAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold"
-            android:textColor="@color/expense_red"/>
+            android:textColor="@color/text_primary_dark"/>
 
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="@color/text_secondary_dark"/>
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

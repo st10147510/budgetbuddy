@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background_light">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -14,14 +14,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingBottom="24dp">
 
+            <!-- Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:paddingHorizontal="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="8dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -34,59 +37,100 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/hello"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_secondary"/>
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary_dark"/>
 
                     <TextView
                         android:id="@+id/tvUserName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/user_name_placeholder"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/text_primary"/>
+                        android:textColor="@color/text_primary_dark"/>
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddExpense"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:text="@string/add_expense"
-                    app:backgroundTint="@color/purple_primary"
+                    android:textSize="13sp"
+                    android:textColor="@color/background"
+                    app:backgroundTint="@color/teal_accent"
+                    app:cornerRadius="20dp"
                     app:icon="@drawable/ic_add"
-                    app:iconGravity="textStart"/>
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/background"/>
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Accounts section label -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Accounts"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_dark"/>
+
+                <TextView
+                    android:id="@+id/tvSeeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View All ›"
+                    android:textColor="@color/text_secondary_dark"
+                    android:textSize="13sp"
+                    android:padding="4dp"/>
+            </LinearLayout>
+
+            <!-- Dark account card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="24dp"
                 app:cardBackgroundColor="@color/surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/monthly_spending"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="@color/text_secondary"
-                        android:layout_marginBottom="4dp"/>
+                        android:layout_marginBottom="8dp"/>
 
                     <TextView
                         android:id="@+id/tvMonthlyTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="R 0.00"
-                        android:textSize="36sp"
+                        android:textSize="34sp"
                         android:textStyle="bold"
-                        android:textColor="@color/text_primary"/>
+                        android:textColor="@color/white"
+                        android:layout_marginBottom="0dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
 
                     <TextView
                         android:id="@+id/tvMonth"
@@ -95,14 +139,27 @@
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"/>
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
+                <!-- Decorative coral circle -->
+                <View
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/bg_shape_oval_coral"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:alpha="0.85"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Recent Transactions section label -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:layout_width="0dp"
@@ -111,21 +168,14 @@
                     android:text="@string/recent_transactions"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
-
-                <TextView
-                    android:id="@+id/tvSeeAll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/see_all"
-                    android:textColor="@color/purple_primary"
-                    android:padding="8dp"/>
+                    android:textColor="@color/text_primary_dark"/>
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
                 android:nestedScrollingEnabled="false"/>
 
             <TextView
@@ -133,10 +183,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/no_transactions"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_secondary_dark"
                 android:gravity="center"
-                android:padding="32dp"
+                android:padding="40dp"
                 android:visibility="gone"/>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

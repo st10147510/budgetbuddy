@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/surface"
-    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/background_light"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
     android:layout_marginBottom="12dp">
 
@@ -19,15 +19,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:id="@+id/tvCategoryIcon"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:textSize="18sp"
-                android:background="@drawable/bg_circle"
+                android:background="@drawable/bg_icon_circle_dark"
                 android:layout_marginEnd="12dp"/>
 
             <LinearLayout
@@ -40,9 +40,9 @@
                     android:id="@+id/tvCategoryName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
+                    android:textColor="@color/text_primary_dark"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -54,21 +54,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="12sp"
-                        android:textColor="@color/text_secondary"/>
+                        android:textColor="@color/text_secondary_dark"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" / "
                         android:textSize="12sp"
-                        android:textColor="@color/text_secondary"/>
+                        android:textColor="@color/text_secondary_dark"/>
 
                     <TextView
                         android:id="@+id/tvLimit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="12sp"
-                        android:textColor="@color/text_secondary"/>
+                        android:textColor="@color/text_secondary_dark"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:textColor="@color/accent_teal"/>
+                android:textColor="@color/teal_accent"/>
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -92,9 +92,10 @@
         <ProgressBar
             android:id="@+id/progressBudget"
             android:layout_width="match_parent"
-            android:layout_height="8dp"
+            android:layout_height="6dp"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:max="100"
-            android:progressTint="@color/accent_teal"/>
+            android:progressTint="@color/teal_accent"
+            android:progressBackgroundTint="@color/divider_light"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
