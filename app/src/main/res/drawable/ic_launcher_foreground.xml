@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Wavy lines (drawn behind shapes) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2A2A2A"
+        android:strokeWidth="1.5"
+        android:pathData="M8,68 C28,64 48,72 68,68 C82,65 94,70 104,68"/>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2A2A2A"
+        android:strokeWidth="1.5"
+        android:pathData="M8,74 C28,70 48,78 68,74 C82,71 94,76 104,74"/>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2A2A2A"
+        android:strokeWidth="1.5"
+        android:pathData="M8,80 C28,76 48,84 68,80 C82,77 94,82 104,80"/>
+
+    <!-- Coral teardrop (top-left) -->
+    <path
+        android:fillColor="#E8847A"
+        android:pathData="M36,54 C29,47 19,38 19,28 A17,17 0 1,1 53,28 C53,38 43,47 36,54Z"/>
+
+    <!-- White ring (top-right) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M62,28 A14,14 0 1,0 90,28 A14,14 0 1,0 62,28Z M68,28 A8,8 0 1,0 84,28 A8,8 0 1,0 68,28Z"/>
+
+    <!-- Teal ring (bottom-left) -->
+    <path
+        android:fillColor="#6EDCD3"
+        android:fillType="evenOdd"
+        android:pathData="M16,66 A14,14 0 1,0 44,66 A14,14 0 1,0 16,66Z M23,66 A7,7 0 1,0 37,66 A7,7 0 1,0 23,66Z"/>
+
+    <!-- Cream half-circle (bottom-center, right half) -->
+    <path
+        android:fillColor="#F5D5A8"
+        android:pathData="M54,52 A14,14 0 0,1 54,80Z"/>
+
+    <!-- Teal rounded rect (bottom-right) -->
+    <path
+        android:fillColor="#6EDCD3"
+        android:pathData="M79,48 A7,7 0 0,1 86,55 L86,74 A7,7 0 0,1 79,81 A7,7 0 0,1 72,74 L72,55 A7,7 0 0,1 79,48Z"/>
+
+</vector>
