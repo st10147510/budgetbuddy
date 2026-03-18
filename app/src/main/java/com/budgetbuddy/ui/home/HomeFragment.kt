@@ -17,6 +17,7 @@ import com.budgetbuddy.databinding.FragmentHomeBinding
 import com.budgetbuddy.ui.expense.TransactionAdapter
 import com.budgetbuddy.ui.expense.TransactionWithCategory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -62,13 +63,15 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.tvMonthlyTotal.text = "R %.2f".format(state.totalSpendThisMonth)
-                    val catMap = viewModel.categories.value.associateBy { it.id }
+                combine(viewModel.uiState, viewModel.categories) { state, categories ->
+                    val catMap = categories.associateBy { it.id }
                     val items = state.recentTransactions.map { tx ->
                         val cat = catMap[tx.categoryId]
                         TransactionWithCategory(tx, cat?.name ?: "Other", cat?.icon ?: "📦")
                     }
+                    Pair(state, items)
+                }.collect { (state, items) ->
+                    binding.tvMonthlyTotal.text = "R %.2f".format(state.totalSpendThisMonth)
                     adapter.submitList(items)
                     binding.tvEmptyState.visibility =
                         if (state.recentTransactions.isEmpty()) View.VISIBLE else View.GONE
