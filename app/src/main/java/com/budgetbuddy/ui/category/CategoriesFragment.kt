@@ -11,11 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.budgetbuddy.R
+import com.budgetbuddy.databinding.DialogAddCategoryBinding
 import com.budgetbuddy.databinding.FragmentCategoriesBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -55,24 +53,23 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun showAddCategoryDialog() {
-        val nameInput = TextInputEditText(requireContext()).apply { hint = "Category name" }
-        val iconInput = TextInputEditText(requireContext()).apply { hint = "Icon (emoji, e.g. 🛒)" }
-        val container = android.widget.LinearLayout(requireContext()).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            setPadding(48, 16, 48, 8)
-            addView(TextInputLayout(requireContext()).apply { addView(nameInput) })
-            addView(TextInputLayout(requireContext()).apply { addView(iconInput) })
-        }
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Add Category")
-            .setView(container)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val name = nameInput.text.toString().trim()
-                val icon = iconInput.text.toString().trim().ifEmpty { "📦" }
-                if (name.isNotEmpty()) viewModel.addCategory(name, icon)
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogBinding = DialogAddCategoryBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val sheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        sheet?.setBackgroundResource(android.R.color.transparent)
+
+        dialogBinding.btnSave.setOnClickListener {
+            val name = dialogBinding.etName.text.toString().trim()
+            val icon = dialogBinding.etIcon.text.toString().trim().ifEmpty { "📦" }
+            if (name.isNotEmpty()) {
+                viewModel.addCategory(name, icon)
+                dialog.dismiss()
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        }
+        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     override fun onDestroyView() {
