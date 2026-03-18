@@ -2,6 +2,7 @@ package com.budgetbuddy.ui.reports
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.CategoryRepository
 import com.budgetbuddy.data.repository.TransactionRepository
@@ -9,16 +10,20 @@ import com.budgetbuddy.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
-
-
 
 data class CategorySpend(val name: String, val icon: String, val amount: Double, val colorHex: String)
 
+data class MonthTotal(val label: String, val total: Float)
+
 data class ReportsUiState(
-    val categorySpends: List<CategorySpend> = emptyList(),
+    val balance: Double = 0.0,
     val totalExpense: Double = 0.0,
     val totalIncome: Double = 0.0,
+    val transactions: List<TransactionEntity> = emptyList(),
+    val categorySpends: List<CategorySpend> = emptyList(),
+    val monthlyTotals: List<MonthTotal> = emptyList(),
     val isLoading: Boolean = false
 )
 
@@ -31,18 +36,43 @@ class ReportsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ReportsUiState())
     val uiState: StateFlow<ReportsUiState> = _uiState.asStateFlow()
 
+    val categories = categoryRepository.getAllCategories()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private var userId: String = ""
+    private var selectedYear: Int = Calendar.getInstance().get(Calendar.YEAR)
+    private var selectedMonth: Int = Calendar.getInstance().get(Calendar.MONTH) // 0-based
+
     fun loadReports(userId: String) {
+        this.userId = userId
+        loadSelectedMonth()
+        loadMonthlyTotals()
+    }
+
+    fun selectMonth(month: Int, year: Int) {
+        selectedMonth = month
+        selectedYear = year
+        loadSelectedMonth()
+    }
+
+    private fun loadSelectedMonth() {
+        if (userId.isEmpty()) return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val start = DateUtils.startOfMonth()
-            val end = DateUtils.endOfMonth()
+            val cal = Calendar.getInstance().apply { set(selectedYear, selectedMonth, 1, 0, 0, 0); set(Calendar.MILLISECOND, 0) }
+            val start = cal.timeInMillis
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+            cal.set(Calendar.HOUR_OF_DAY, 23); cal.set(Calendar.MINUTE, 59); cal.set(Calendar.SECOND, 59)
+            val end = cal.timeInMillis
 
             transactionRepository.getTransactionsByDateRange(userId, start, end).collect { transactions ->
-                val categories = categoryRepository.getAllCategories().first()
-                val catMap = categories.associateBy { it.id }
+                val cats = categoryRepository.getAllCategories().first()
+                val catMap = cats.associateBy { it.id }
 
                 val expenses = transactions.filter { it.type == TransactionType.EXPENSE }
                 val incomes = transactions.filter { it.type == TransactionType.INCOME }
+                val totalExpense = expenses.sumOf { it.amount }
+                val totalIncome = incomes.sumOf { it.amount }
 
                 val categorySpends = expenses
                     .groupBy { it.categoryId }
@@ -59,13 +89,39 @@ class ReportsViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
+                        balance = totalIncome - totalExpense,
+                        totalExpense = totalExpense,
+                        totalIncome = totalIncome,
+                        transactions = transactions.sortedByDescending { tx -> tx.date },
                         categorySpends = categorySpends,
-                        totalExpense = expenses.sumOf { it.amount },
-                        totalIncome = incomes.sumOf { it.amount },
                         isLoading = false
                     )
                 }
             }
+        }
+    }
+
+    private fun loadMonthlyTotals() {
+        if (userId.isEmpty()) return
+        viewModelScope.launch {
+            val totals = mutableListOf<MonthTotal>()
+            val monthLabels = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+            val cal = Calendar.getInstance()
+            // last 6 months
+            for (i in 5 downTo 0) {
+                val c = Calendar.getInstance()
+                c.add(Calendar.MONTH, -i)
+                val m = c.get(Calendar.MONTH)
+                val y = c.get(Calendar.YEAR)
+                c.set(y, m, 1, 0, 0, 0); c.set(Calendar.MILLISECOND, 0)
+                val start = c.timeInMillis
+                c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH))
+                c.set(Calendar.HOUR_OF_DAY, 23); c.set(Calendar.MINUTE, 59); c.set(Calendar.SECOND, 59)
+                val end = c.timeInMillis
+                val total = transactionRepository.getTotalExpenseForPeriod(userId, start, end)
+                totals.add(MonthTotal(monthLabels[m], total.toFloat()))
+            }
+            _uiState.update { it.copy(monthlyTotals = totals) }
         }
     }
 }
