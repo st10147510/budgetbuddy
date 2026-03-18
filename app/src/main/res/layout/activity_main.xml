@@ -21,10 +21,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/background_light"
+        android:elevation="12dp"
         app:itemIconTint="@color/bottom_nav_colors"
         app:itemTextColor="@color/bottom_nav_colors"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu"
-        app:elevation="8dp"/>
+        app:menu="@menu/bottom_nav_menu"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
