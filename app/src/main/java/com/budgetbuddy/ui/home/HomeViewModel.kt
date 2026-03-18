@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.repository.BudgetRepository
 import com.budgetbuddy.data.repository.CategoryRepository
+import com.budgetbuddy.data.repository.GoalRepository
 import com.budgetbuddy.data.repository.TransactionRepository
 import com.budgetbuddy.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val categoryRepository: CategoryRepository,
-    private val budgetRepository: BudgetRepository
+    private val budgetRepository: BudgetRepository,
+    private val goalRepository: GoalRepository
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow("")
@@ -33,10 +35,22 @@ class HomeViewModel @Inject constructor(
     val categories = categoryRepository.getAllCategories()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val _goalsState = MutableStateFlow<List<com.budgetbuddy.data.local.entities.GoalEntity>>(emptyList())
+    val goals: StateFlow<List<com.budgetbuddy.data.local.entities.GoalEntity>> = _goalsState.asStateFlow()
+
     fun init(userId: String) {
         _userId.value = userId
         loadRecentTransactions(userId)
         loadMonthlyTotal(userId)
+        loadGoals(userId)
+    }
+
+    private fun loadGoals(userId: String) {
+        viewModelScope.launch {
+            goalRepository.getActiveGoals(userId).collect { goals ->
+                _goalsState.value = goals
+            }
+        }
     }
 
     private fun loadRecentTransactions(userId: String) {

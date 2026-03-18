@@ -34,6 +34,7 @@ class HomeFragment : Fragment() {
     @Inject lateinit var session: SessionManager
 
     private val adapter = TransactionAdapter()
+    private val goalAdapter = GoalPreviewAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -46,11 +47,15 @@ class HomeFragment : Fragment() {
         binding.rvTransactions.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTransactions.adapter = adapter
 
+        binding.rvGoals.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvGoals.adapter = goalAdapter
+
         binding.tvUserName.text = session.displayName ?: session.email?.substringBefore('@') ?: "User"
         binding.tvMonth.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(Date())
 
         binding.btnAddExpense.setOnClickListener { findNavController().navigate(R.id.addExpenseFragment) }
         binding.tvSeeAll.setOnClickListener { findNavController().navigate(R.id.transactionListFragment) }
+        binding.tvGoalsViewAll.setOnClickListener { findNavController().navigate(R.id.goalsFragment) }
 
         val userId = session.userId ?: return
         viewModel.init(userId)
@@ -67,6 +72,15 @@ class HomeFragment : Fragment() {
                     adapter.submitList(items)
                     binding.tvEmptyState.visibility =
                         if (state.recentTransactions.isEmpty()) View.VISIBLE else View.GONE
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.goals.collect { goals ->
+                    goalAdapter.submitList(goals)
+                    binding.goalsSection.visibility = if (goals.isEmpty()) View.GONE else View.VISIBLE
                 }
             }
         }
