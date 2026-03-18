@@ -32,6 +32,8 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnBack.setOnClickListener { findNavController().navigateUp() }
+
         binding.btnSignUp.setOnClickListener {
             viewModel.signUp(
                 email = binding.etEmail.text.toString().trim(),
