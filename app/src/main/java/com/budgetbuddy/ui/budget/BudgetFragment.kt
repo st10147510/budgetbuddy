@@ -4,20 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.budgetbuddy.R
 import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.data.local.entities.CategoryEntity
 import com.budgetbuddy.data.repository.CategoryRepository
+import com.budgetbuddy.databinding.DialogAddBudgetBinding
 import com.budgetbuddy.databinding.FragmentBudgetBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -66,34 +65,33 @@ class BudgetFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val categories = categoryRepository.getAllCategories().first()
             if (categories.isEmpty()) return@launch
-            var selected: CategoryEntity = categories[0]
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Set Budget")
-                .setSingleChoiceItems(categories.map { "${it.icon} ${it.name}" }.toTypedArray(), 0) { _, i ->
-                    selected = categories[i]
-                }
-                .setPositiveButton(R.string.save) { _, _ -> showAmountDialog(userId, selected) }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-        }
-    }
 
-    private fun showAmountDialog(userId: String, category: CategoryEntity) {
-        val input = TextInputEditText(requireContext()).apply {
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-        }
-        val container = TextInputLayout(requireContext()).apply {
-            prefixText = "R "; hint = getString(R.string.budget_limit); addView(input); setPadding(48, 16, 48, 8)
-        }
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("${category.icon} ${category.name}")
-            .setView(container)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val amount = input.text.toString().toDoubleOrNull() ?: return@setPositiveButton
-                if (amount > 0) viewModel.saveBudget(userId, category.id, amount)
+            val dialog = BottomSheetDialog(requireContext())
+            val dialogBinding = DialogAddBudgetBinding.inflate(layoutInflater)
+            dialog.setContentView(dialogBinding.root)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            val sheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            sheet?.setBackgroundResource(android.R.color.transparent)
+
+            var selectedCategory: CategoryEntity = categories[0]
+            val labels = categories.map { "${it.icon} ${it.name}" }
+            val dropdownAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, labels)
+            dialogBinding.actvCategory.setAdapter(dropdownAdapter)
+            dialogBinding.actvCategory.setText(labels[0], false)
+            dialogBinding.actvCategory.setOnItemClickListener { _, _, position, _ ->
+                selectedCategory = categories[position]
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+
+            dialogBinding.btnSave.setOnClickListener {
+                val amount = dialogBinding.etAmount.text.toString().toDoubleOrNull() ?: 0.0
+                if (amount > 0) {
+                    viewModel.saveBudget(userId, selectedCategory.id, amount)
+                    dialog.dismiss()
+                }
+            }
+            dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+            dialog.show()
+        }
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

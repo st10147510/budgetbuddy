@@ -34,6 +34,15 @@ class ExpenseViewModel @Inject constructor(
     val categories = categoryRepository.getAllCategories()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val _transactions = MutableStateFlow<List<TransactionEntity>>(emptyList())
+    val transactions: StateFlow<List<TransactionEntity>> = _transactions.asStateFlow()
+
+    fun loadAllTransactions(userId: String) {
+        viewModelScope.launch {
+            transactionRepository.getAllTransactions(userId).collect { _transactions.value = it }
+        }
+    }
+
     private var _currentTransaction: TransactionEntity? = null
 
     fun loadTransaction(id: Long) {

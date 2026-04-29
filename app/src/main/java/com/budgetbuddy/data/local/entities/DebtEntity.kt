@@ -10,7 +10,8 @@ data class DebtEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val userId: String,
     val name: String,
-    val balance: Double,
+    val originalBalance: Double,    // balance at the time the debt was added
+    val balance: Double,            // current outstanding balance (reduced by payments)
     val interestRate: Double,       // annual percentage, e.g. 18.5
     val minimumPayment: Double,
     val isPaidOff: Boolean = false,

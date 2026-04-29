@@ -35,11 +35,26 @@ class DebtViewModel @Inject constructor(
                 DebtEntity(
                     userId = userId,
                     name = name,
+                    originalBalance = balance, // snapshot of the starting balance for progress tracking
                     balance = balance,
                     interestRate = interestRate,
                     minimumPayment = minPayment
                 )
             )
+        }
+    }
+
+    /**
+     * Records a payment against a debt:
+     * - Reduces the current balance by [amount]
+     * - Marks the debt as paid off if balance reaches zero
+     */
+    fun makePayment(debt: DebtEntity, amount: Double) {
+        if (amount <= 0) return
+        viewModelScope.launch {
+            val newBalance = maxOf(0.0, debt.balance - amount)
+            val updatedDebt = debt.copy(balance = newBalance, isPaidOff = newBalance == 0.0)
+            debtRepository.updateDebt(updatedDebt)
         }
     }
 

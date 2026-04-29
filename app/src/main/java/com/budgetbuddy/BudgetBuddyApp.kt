@@ -45,11 +45,21 @@ class BudgetBuddyApp : Application(), Configuration.Provider {
                     NotificationManager.IMPORTANCE_LOW
                 ).apply { description = "Daily nudges to log expenses" }
             )
+
+            // High-importance so the notification pops up on screen as a heads-up
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    CHANNEL_BADGE_ACHIEVEMENTS,
+                    "Badge Achievements",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply { description = "Congratulatory pop-ups when a new badge is earned" }
+            )
         }
     }
 
     companion object {
-        const val CHANNEL_BUDGET_ALERTS  = "budget_alerts"
-        const val CHANNEL_DAILY_REMINDER = "daily_reminder"
+        const val CHANNEL_BUDGET_ALERTS      = "budget_alerts"
+        const val CHANNEL_DAILY_REMINDER     = "daily_reminder"
+        const val CHANNEL_BADGE_ACHIEVEMENTS = "badge_achievements"
     }
 }

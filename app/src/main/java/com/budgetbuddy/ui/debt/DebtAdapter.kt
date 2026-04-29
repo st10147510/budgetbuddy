@@ -9,7 +9,8 @@ import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.databinding.ItemDebtBinding
 
 class DebtAdapter(
-    private val onDelete: (DebtEntity) -> Unit
+    private val onDelete: (DebtEntity) -> Unit,
+    private val onPayment: (DebtEntity) -> Unit
 ) : ListAdapter<DebtEntity, DebtAdapter.ViewHolder>(DIFF) {
 
     companion object {
@@ -27,7 +28,17 @@ class DebtAdapter(
             binding.tvInterestRate.text = "%.1f%% interest".format(item.interestRate)
             binding.tvBalance.text = "R %.2f".format(item.balance)
             binding.tvMinPayment.text = "Min: R %.2f/mo".format(item.minimumPayment)
+
+            // Payoff progress: (originalBalance - currentBalance) / originalBalance * 100
+            val progressPct = if (item.originalBalance > 0) {
+                ((item.originalBalance - item.balance) / item.originalBalance * 100)
+                    .coerceIn(0.0, 100.0).toInt()
+            } else 0
+            binding.progressDebt.progress = progressPct
+            binding.tvProgress.text = "$progressPct%"
+
             binding.btnDelete.setOnClickListener { onDelete(item) }
+            binding.btnMakePayment.setOnClickListener { onPayment(item) }
         }
     }
 

@@ -19,6 +19,9 @@ interface BudgetDao {
     """)
     suspend fun getBudgetForCategory(userId: String, categoryId: Long, month: Int, year: Int): BudgetEntity?
 
+    @Query("SELECT * FROM budgets WHERE userId = :userId AND month = :month AND year = :year")
+    suspend fun getBudgetsForMonthOnce(userId: String, month: Int, year: Int): List<BudgetEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateBudget(budget: BudgetEntity): Long
 

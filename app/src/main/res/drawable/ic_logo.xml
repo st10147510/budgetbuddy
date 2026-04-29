@@ -4,12 +4,54 @@
     android:height="120dp"
     android:viewportWidth="120"
     android:viewportHeight="120">
+
+    <!-- Black background -->
     <path
-        android:fillColor="#6B4EFF"
-        android:pathData="M60,10C32.4,10 10,32.4 10,60C10,87.6 32.4,110 60,110C87.6,110 110,87.6 110,60C110,32.4 87.6,10 60,10Z"/>
+        android:fillColor="#0D0D0D"
+        android:pathData="M0,0 L120,0 L120,120 L0,120 Z"/>
+
+    <!-- Wavy lines -->
     <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="4"
         android:fillColor="#00000000"
-        android:pathData="M35,75L50,55L65,65L80,45"/>
+        android:strokeColor="#2A2A2A"
+        android:strokeWidth="2"
+        android:pathData="M8,74 C30,70 52,78 74,74 C90,71 104,76 116,74"/>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2A2A2A"
+        android:strokeWidth="2"
+        android:pathData="M8,82 C30,78 52,86 74,82 C90,79 104,84 116,82"/>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2A2A2A"
+        android:strokeWidth="2"
+        android:pathData="M8,90 C30,86 52,94 74,90 C90,87 104,92 116,90"/>
+
+    <!-- Coral teardrop (top-left) -->
+    <path
+        android:fillColor="#E8847A"
+        android:pathData="M40,60 C32,52 20,42 20,30 A20,20 0 1,1 60,30 C60,42 48,52 40,60Z"/>
+
+    <!-- White ring (top-right) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M68,30 A16,16 0 1,0 100,30 A16,16 0 1,0 68,30Z M76,30 A8,8 0 1,0 92,30 A8,8 0 1,0 76,30Z"/>
+
+    <!-- Teal ring (bottom-left) -->
+    <path
+        android:fillColor="#6EDCD3"
+        android:fillType="evenOdd"
+        android:pathData="M16,76 A16,16 0 1,0 48,76 A16,16 0 1,0 16,76Z M24,76 A8,8 0 1,0 40,76 A8,8 0 1,0 24,76Z"/>
+
+    <!-- Cream half-circle (bottom-center) -->
+    <path
+        android:fillColor="#F5D5A8"
+        android:pathData="M60,60 A16,16 0 0,1 60,92Z"/>
+
+    <!-- Teal rounded rect (bottom-right) -->
+    <path
+        android:fillColor="#6EDCD3"
+        android:pathData="M88,54 A8,8 0 0,1 96,62 L96,84 A8,8 0 0,1 88,92 A8,8 0 0,1 80,84 L80,62 A8,8 0 0,1 88,54Z"/>
+
 </vector>

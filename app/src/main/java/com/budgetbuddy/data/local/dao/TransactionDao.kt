@@ -48,6 +48,14 @@ interface TransactionDao {
     @Query("""
         SELECT SUM(amount) FROM transactions
         WHERE userId = :userId
+        AND type = 'INCOME'
+        AND date BETWEEN :startDate AND :endDate
+    """)
+    suspend fun getTotalIncomeForPeriod(userId: String, startDate: Long, endDate: Long): Double?
+
+    @Query("""
+        SELECT SUM(amount) FROM transactions
+        WHERE userId = :userId
         AND categoryId = :categoryId
         AND type = 'EXPENSE'
         AND date BETWEEN :startDate AND :endDate

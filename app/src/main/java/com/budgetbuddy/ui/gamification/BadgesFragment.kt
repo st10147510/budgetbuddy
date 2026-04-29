@@ -47,12 +47,22 @@ class BadgesFragment : Fragment() {
         val fmt = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.badges.collect { badges ->
-                    val items = badges.map { badge ->
-                        BadgeItem(badgeIcon(badge.badgeType), badgeName(badge.badgeType),
-                            "Earned ${fmt.format(Date(badge.earnedAt))}")
+                viewModel.badges.collect { earnedBadges ->
+                    val earnedMap = earnedBadges.associateBy { it.badgeType }
+                    // Always show all badge types — earned ones show the date, locked ones show "Locked"
+                    val items = BadgeType.values().map { type ->
+                        val earned = earnedMap[type]
+                        BadgeItem(
+                            icon = badgeIcon(type),
+                            name = badgeName(type),
+                            description = badgeDescription(type),
+                            earnedOn = earned?.let { "Earned ${fmt.format(Date(it.earnedAt))}" }
+                        )
                     }
-                    binding.rvBadges.adapter = BadgeAdapter(items)
+                    // Show earned badges first, then locked ones
+                    binding.rvBadges.adapter = BadgeAdapter(
+                        items.sortedByDescending { it.isEarned }
+                    )
                 }
             }
         }
@@ -76,6 +86,16 @@ class BadgesFragment : Fragment() {
         BadgeType.DEBT_SLAYER   -> "Debt Slayer"
         BadgeType.GOAL_GETTER   -> "Goal Getter"
         BadgeType.THRIFTY_CHAMP -> "Thrifty Champ"
+    }
+
+    private fun badgeDescription(type: BadgeType) = when (type) {
+        BadgeType.FIRST_STEP    -> "Log your very first transaction"
+        BadgeType.DAILY_TRACKER -> "Log a transaction every day for 7 days in a row"
+        BadgeType.PERFECT_MONTH -> "Earn more than you spend in a calendar month"
+        BadgeType.BUDGET_MASTER -> "Keep every budget category under its limit this month"
+        BadgeType.DEBT_SLAYER   -> "Fully pay off at least one debt"
+        BadgeType.GOAL_GETTER   -> "Complete at least one savings goal"
+        BadgeType.THRIFTY_CHAMP -> "Save at least 33% of your income in a month"
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

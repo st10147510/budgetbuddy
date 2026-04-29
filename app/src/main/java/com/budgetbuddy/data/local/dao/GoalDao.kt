@@ -16,6 +16,9 @@ interface GoalDao {
     @Query("SELECT * FROM goals WHERE userId = :userId AND isCompleted = 0")
     fun getActiveGoals(userId: String): Flow<List<GoalEntity>>
 
+    @Query("SELECT COUNT(*) FROM goals WHERE userId = :userId AND isCompleted = 1")
+    suspend fun getCompletedGoalsCount(userId: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGoal(goal: GoalEntity): Long
 

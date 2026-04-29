@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentTransactionListBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,11 +41,22 @@ class TransactionListFragment : Fragment() {
         binding.rvTransactions.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTransactions.adapter = adapter
 
+        val userId = session.userId ?: return
+        viewModel.loadAllTransactions(userId)
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.categories.collect { categories ->
+                combine(
+                    viewModel.transactions,
+                    viewModel.categories
+                ) { transactions, categories ->
                     val catMap = categories.associateBy { it.id }
-                    // Combine with transactions when both are available
+                    transactions.map { tx ->
+                        val cat = catMap[tx.categoryId]
+                        TransactionWithCategory(tx, cat?.name ?: "Other", cat?.icon ?: "📦")
+                    }
+                }.collect { items ->
+                    adapter.submitList(items)
                 }
             }
         }
