@@ -1,11 +1,11 @@
 package com.budgetbuddy.ui.home
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import app.cash.turbine.test
 import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.BudgetRepository
 import com.budgetbuddy.data.repository.CategoryRepository
+import com.budgetbuddy.data.repository.GoalRepository
 import com.budgetbuddy.data.repository.TransactionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +28,7 @@ class HomeViewModelTest {
     private lateinit var transactionRepository: TransactionRepository
     private lateinit var categoryRepository: CategoryRepository
     private lateinit var budgetRepository: BudgetRepository
+    private lateinit var goalRepository: GoalRepository
     private lateinit var viewModel: HomeViewModel
 
     @Before
@@ -36,8 +37,10 @@ class HomeViewModelTest {
         transactionRepository = mock()
         categoryRepository = mock()
         budgetRepository = mock()
+        goalRepository = mock()
         whenever(categoryRepository.getAllCategories()).thenReturn(flowOf(emptyList()))
-        viewModel = HomeViewModel(transactionRepository, categoryRepository, budgetRepository)
+        whenever(goalRepository.getActiveGoals(any())).thenReturn(flowOf(emptyList()))
+        viewModel = HomeViewModel(transactionRepository, categoryRepository, budgetRepository, goalRepository)
     }
 
     @After
@@ -58,12 +61,11 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `init loads monthly total from repository`() = runTest {
-        val transactions = listOf(tx(1L, 200.0), tx(2L, 300.0))
-        whenever(transactionRepository.getRecentTransactions("user1", 5))
-            .thenReturn(flowOf(transactions))
-        whenever(transactionRepository.getTotalExpenseForPeriod(eq("user1"), any(), any()))
-            .thenReturn(500.0)
+    fun `init loads monthly totals from transaction flow`() = runTest {
+        val expenses = listOf(tx(1L, 200.0), tx(2L, 300.0))
+        whenever(transactionRepository.getRecentTransactions("user1", 5)).thenReturn(flowOf(emptyList()))
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(expenses))
 
         viewModel.init("user1")
         advanceUntilIdle()
@@ -72,29 +74,34 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `init calculates balance as income minus expense`() = runTest {
+        val transactions = listOf(
+            tx(1L, 1000.0, TransactionType.INCOME),
+            tx(2L, 400.0, TransactionType.EXPENSE)
+        )
+        whenever(transactionRepository.getRecentTransactions("user1", 5)).thenReturn(flowOf(emptyList()))
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(transactions))
+
+        viewModel.init("user1")
+        advanceUntilIdle()
+
+        assertEquals(600.0, viewModel.uiState.value.balance, 0.001)
+        assertEquals(1000.0, viewModel.uiState.value.totalIncomeThisMonth, 0.001)
+        assertEquals(400.0, viewModel.uiState.value.totalSpendThisMonth, 0.001)
+    }
+
+    @Test
     fun `init loads recent transactions`() = runTest {
         val transactions = listOf(tx(1L, 100.0), tx(2L, 200.0))
         whenever(transactionRepository.getRecentTransactions("user1", 5))
             .thenReturn(flowOf(transactions))
-        whenever(transactionRepository.getTotalExpenseForPeriod(eq("user1"), any(), any()))
-            .thenReturn(300.0)
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(emptyList()))
 
         viewModel.init("user1")
         advanceUntilIdle()
 
         assertEquals(2, viewModel.uiState.value.recentTransactions.size)
-    }
-
-    @Test
-    fun `refresh reloads data`() = runTest {
-        whenever(transactionRepository.getRecentTransactions("user1", 5))
-            .thenReturn(flowOf(emptyList()))
-        whenever(transactionRepository.getTotalExpenseForPeriod(eq("user1"), any(), any()))
-            .thenReturn(0.0)
-
-        viewModel.refresh("user1")
-        advanceUntilIdle()
-
-        verify(transactionRepository, atLeastOnce()).getRecentTransactions("user1", 5)
     }
 }

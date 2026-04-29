@@ -22,7 +22,7 @@ class DebtRepositoryTest {
     }
 
     private fun debt(id: Long, name: String, balance: Double, rate: Double, minPayment: Double) =
-        DebtEntity(id = id, userId = "user1", name = name, balance = balance,
+        DebtEntity(id = id, userId = "user1", name = name, originalBalance = balance, balance = balance,
             interestRate = rate, minimumPayment = minPayment)
 
     // ---- Payoff schedule tests ----

@@ -4,6 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.budgetbuddy.data.local.entities.BudgetEntity
 import com.budgetbuddy.data.local.entities.CategoryEntity
+import com.budgetbuddy.data.local.entities.TransactionEntity
+import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.BudgetRepository
 import com.budgetbuddy.data.repository.CategoryRepository
 import com.budgetbuddy.data.repository.TransactionRepository
@@ -51,17 +53,21 @@ class BudgetViewModelTest {
     private fun budget(id: Long, limit: Double, month: Int = 3, year: Int = 2026) =
         BudgetEntity(id = id, userId = "user1", categoryId = 1L, limitAmount = limit, month = month, year = year)
 
+    private fun expenseTx(amount: Double) =
+        TransactionEntity(id = 0, userId = "user1", amount = amount, categoryId = 1L,
+            date = System.currentTimeMillis(), type = TransactionType.EXPENSE)
+
     @Test
     fun `loadBudgets emits BudgetWithSpend with correct status OK`() = runTest {
         val budget = budget(1L, 1000.0)
         whenever(budgetRepository.getBudgetsForMonth(eq("user1"), any(), any()))
             .thenReturn(flowOf(listOf(budget)))
         whenever(categoryRepository.getCategoryById(1L)).thenReturn(testCategory)
-        whenever(transactionRepository.getTotalExpenseByCategoryAndPeriod(any(), any(), any(), any()))
-            .thenReturn(500.0) // 50% — OK
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(listOf(expenseTx(500.0)))) // 50% — OK
 
         viewModel.budgetsWithSpend.test {
-            skipItems(1) // skip initial emptyList
+            skipItems(1)
             viewModel.loadBudgets("user1")
             val result = awaitItem()
             assertEquals(1, result.size)
@@ -77,8 +83,8 @@ class BudgetViewModelTest {
         whenever(budgetRepository.getBudgetsForMonth(eq("user1"), any(), any()))
             .thenReturn(flowOf(listOf(budget)))
         whenever(categoryRepository.getCategoryById(1L)).thenReturn(testCategory)
-        whenever(transactionRepository.getTotalExpenseByCategoryAndPeriod(any(), any(), any(), any()))
-            .thenReturn(850.0) // 85%
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(listOf(expenseTx(850.0)))) // 85%
 
         viewModel.budgetsWithSpend.test {
             skipItems(1)
@@ -95,8 +101,8 @@ class BudgetViewModelTest {
         whenever(budgetRepository.getBudgetsForMonth(eq("user1"), any(), any()))
             .thenReturn(flowOf(listOf(budget)))
         whenever(categoryRepository.getCategoryById(1L)).thenReturn(testCategory)
-        whenever(transactionRepository.getTotalExpenseByCategoryAndPeriod(any(), any(), any(), any()))
-            .thenReturn(1100.0) // 110% — exceeded
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(listOf(expenseTx(1100.0)))) // 110% — exceeded
 
         viewModel.budgetsWithSpend.test {
             skipItems(1)
@@ -112,7 +118,9 @@ class BudgetViewModelTest {
         val budget = budget(1L, 1000.0)
         whenever(budgetRepository.getBudgetsForMonth(eq("user1"), any(), any()))
             .thenReturn(flowOf(listOf(budget)))
-        whenever(categoryRepository.getCategoryById(1L)).thenReturn(null) // missing category
+        whenever(categoryRepository.getCategoryById(1L)).thenReturn(null)
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(emptyList()))
 
         viewModel.loadBudgets("user1")
         advanceUntilIdle()
@@ -140,8 +148,8 @@ class BudgetViewModelTest {
         whenever(budgetRepository.getBudgetsForMonth(eq("user1"), any(), any()))
             .thenReturn(flowOf(listOf(budget)))
         whenever(categoryRepository.getCategoryById(1L)).thenReturn(testCategory)
-        whenever(transactionRepository.getTotalExpenseByCategoryAndPeriod(any(), any(), any(), any()))
-            .thenReturn(5000.0) // 500%
+        whenever(transactionRepository.getTransactionsByDateRange(eq("user1"), any(), any()))
+            .thenReturn(flowOf(listOf(expenseTx(5000.0)))) // 500%
 
         viewModel.budgetsWithSpend.test {
             skipItems(1)

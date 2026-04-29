@@ -82,6 +82,23 @@ class AddExpenseFragment : Fragment() {
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when (state) {
+                        is ExpenseUiState.Saved, is ExpenseUiState.Deleted -> {
+                            findNavController().navigateUp()
+                        }
+                        is ExpenseUiState.Error -> {
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            viewModel.resetState()
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+        }
+
         binding.btnSave.setOnClickListener { handleSave() }
     }
 
@@ -107,8 +124,6 @@ class AddExpenseFragment : Fragment() {
             receiptPath = receiptUri?.toString(),
             type = if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE
         )
-        Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_SHORT).show()
-        findNavController().navigateUp()
     }
 
     private fun showDatePicker() {
