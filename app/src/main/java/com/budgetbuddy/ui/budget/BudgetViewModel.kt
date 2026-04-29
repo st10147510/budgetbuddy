@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.budgetbuddy.data.local.entities.BudgetEntity
 import com.budgetbuddy.data.local.entities.CategoryEntity
+import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.BudgetRepository
 import com.budgetbuddy.data.repository.CategoryRepository
 import com.budgetbuddy.data.repository.TransactionRepository
@@ -36,17 +37,27 @@ class BudgetViewModel @Inject constructor(
     private val _saveState = MutableStateFlow<Boolean?>(null)
     val saveState: StateFlow<Boolean?> = _saveState.asStateFlow()
 
+    private var budgetJob: kotlinx.coroutines.Job? = null
+
     fun loadBudgets(userId: String) {
-        viewModelScope.launch {
+        if (budgetJob?.isActive == true) return
+        budgetJob = viewModelScope.launch {
             val month = DateUtils.currentMonth()
             val year  = DateUtils.currentYear()
             val start = DateUtils.startOfMonth()
             val end   = DateUtils.endOfMonth()
 
-            budgetRepository.getBudgetsForMonth(userId, month, year).collect { budgets ->
-                val result = budgets.mapNotNull { budget ->
+            combine(
+                budgetRepository.getBudgetsForMonth(userId, month, year),
+                transactionRepository.getTransactionsByDateRange(userId, start, end)
+            ) { budgets, transactions ->
+                val spendByCat = transactions
+                    .filter { it.type == TransactionType.EXPENSE }
+                    .groupBy { it.categoryId }
+                    .mapValues { (_, txs) -> txs.sumOf { it.amount } }
+                budgets.mapNotNull { budget ->
                     val category = categoryRepository.getCategoryById(budget.categoryId) ?: return@mapNotNull null
-                    val spent = transactionRepository.getTotalExpenseByCategoryAndPeriod(userId, budget.categoryId, start, end)
+                    val spent = spendByCat[budget.categoryId] ?: 0.0
                     val pct = if (budget.limitAmount > 0) ((spent / budget.limitAmount) * 100).toInt().coerceIn(0, 150) else 0
                     val status = when {
                         pct >= 100 -> BudgetStatus.EXCEEDED
@@ -55,8 +66,7 @@ class BudgetViewModel @Inject constructor(
                     }
                     BudgetWithSpend(budget, category, spent, pct, status)
                 }
-                _budgetsWithSpend.value = result
-            }
+            }.collect { _budgetsWithSpend.value = it }
         }
     }
 

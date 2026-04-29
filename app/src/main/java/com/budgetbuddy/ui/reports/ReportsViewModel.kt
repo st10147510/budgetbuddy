@@ -42,6 +42,7 @@ class ReportsViewModel @Inject constructor(
     private var userId: String = ""
     private var selectedYear: Int = Calendar.getInstance().get(Calendar.YEAR)
     private var selectedMonth: Int = Calendar.getInstance().get(Calendar.MONTH) // 0-based
+    private var monthJob: kotlinx.coroutines.Job? = null
 
     fun loadReports(userId: String) {
         this.userId = userId
@@ -57,7 +58,8 @@ class ReportsViewModel @Inject constructor(
 
     private fun loadSelectedMonth() {
         if (userId.isEmpty()) return
-        viewModelScope.launch {
+        monthJob?.cancel()
+        monthJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val cal = Calendar.getInstance().apply { set(selectedYear, selectedMonth, 1, 0, 0, 0); set(Calendar.MILLISECOND, 0) }
             val start = cal.timeInMillis

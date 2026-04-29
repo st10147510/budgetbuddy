@@ -91,7 +91,7 @@ class AuthViewModelTest {
     fun `signUp with empty name emits Error without calling repository`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
-            viewModel.signUp("user@example.com", "password123", "")
+            viewModel.signUp("user@example.com", "password123", "password123", "")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)
             assertEquals("Please enter your full name", (state as AuthUiState.Error).message)
@@ -103,7 +103,7 @@ class AuthViewModelTest {
     fun `signUp with short password emits Error without calling repository`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
-            viewModel.signUp("user@example.com", "short", "Test User")
+            viewModel.signUp("user@example.com", "short", "short", "Test User")
             val state = awaitItem()
             assertTrue(state is AuthUiState.Error)
             assertEquals("Password must be at least 8 characters", (state as AuthUiState.Error).message)
@@ -113,10 +113,10 @@ class AuthViewModelTest {
 
     @Test
     fun `signUp success emits Success state`() = runTest {
-        whenever(authRepository.signUp("user@example.com", "password123", "Test User"))
+        whenever(authRepository.signUp("user@example.com", "Password1@", "Test User"))
             .thenReturn(AuthResult.Success("uid-1", "Test User", "user@example.com"))
 
-        viewModel.signUp("user@example.com", "password123", "Test User")
+        viewModel.signUp("user@example.com", "Password1@", "Password1@", "Test User")
         advanceUntilIdle()
         assertTrue(viewModel.uiState.value is AuthUiState.Success)
     }

@@ -3,6 +3,7 @@ package com.budgetbuddy.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.budgetbuddy.data.local.entities.TransactionEntity
+import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.BudgetRepository
 import com.budgetbuddy.data.repository.CategoryRepository
 import com.budgetbuddy.data.repository.GoalRepository
@@ -41,6 +42,7 @@ class HomeViewModel @Inject constructor(
     val goals: StateFlow<List<com.budgetbuddy.data.local.entities.GoalEntity>> = _goalsState.asStateFlow()
 
     fun init(userId: String) {
+        if (_userId.value == userId) return
         _userId.value = userId
         loadRecentTransactions(userId)
         loadMonthlyTotal(userId)
@@ -67,22 +69,19 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val start = DateUtils.startOfMonth()
             val end = DateUtils.endOfMonth()
-            // Load both income and expense for the month so balance = income - expenses
-            val expense = transactionRepository.getTotalExpenseForPeriod(userId, start, end)
-            val income  = transactionRepository.getTotalIncomeForPeriod(userId, start, end)
-            val balance = income - expense
-            _uiState.update {
-                it.copy(
-                    totalSpendThisMonth = expense,
-                    totalIncomeThisMonth = income,
-                    balance = balance
-                )
+            // Collect from a Flow so balance updates automatically when transactions change
+            transactionRepository.getTransactionsByDateRange(userId, start, end).collect { transactions ->
+                val income  = transactions.filter { it.type == TransactionType.INCOME }.sumOf { it.amount }
+                val expense = transactions.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount }
+                _uiState.update {
+                    it.copy(
+                        totalSpendThisMonth = expense,
+                        totalIncomeThisMonth = income,
+                        balance = income - expense
+                    )
+                }
             }
         }
     }
 
-    fun refresh(userId: String) {
-        loadRecentTransactions(userId)
-        loadMonthlyTotal(userId)
-    }
 }
