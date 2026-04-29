@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeUiState(
+    val balance: Double = 0.0,             // income - expenses (all time)
+    val totalIncomeThisMonth: Double = 0.0,
     val totalSpendThisMonth: Double = 0.0,
     val recentTransactions: List<TransactionEntity> = emptyList(),
     val isLoading: Boolean = false,
@@ -65,8 +67,17 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val start = DateUtils.startOfMonth()
             val end = DateUtils.endOfMonth()
-            val total = transactionRepository.getTotalExpenseForPeriod(userId, start, end)
-            _uiState.update { it.copy(totalSpendThisMonth = total) }
+            // Load both income and expense for the month so balance = income - expenses
+            val expense = transactionRepository.getTotalExpenseForPeriod(userId, start, end)
+            val income  = transactionRepository.getTotalIncomeForPeriod(userId, start, end)
+            val balance = income - expense
+            _uiState.update {
+                it.copy(
+                    totalSpendThisMonth = expense,
+                    totalIncomeThisMonth = income,
+                    balance = balance
+                )
+            }
         }
     }
 

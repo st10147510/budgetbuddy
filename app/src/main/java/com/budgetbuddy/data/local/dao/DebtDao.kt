@@ -27,4 +27,7 @@ interface DebtDao {
 
     @Query("UPDATE debts SET isPaidOff = 1 WHERE id = :id")
     suspend fun markDebtPaidOff(id: Long)
+
+    @Query("SELECT COUNT(*) FROM debts WHERE userId = :userId AND isPaidOff = 1")
+    suspend fun getPaidOffDebtsCount(userId: String): Int
 }

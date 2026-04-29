@@ -13,8 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.budgetbuddy.R
 import com.budgetbuddy.data.local.SessionManager
+import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.data.local.entities.PayoffStrategy
 import com.budgetbuddy.databinding.DialogAddDebtBinding
+import com.budgetbuddy.databinding.DialogMakePaymentBinding
 import com.budgetbuddy.databinding.FragmentDebtBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +33,11 @@ class DebtFragment : Fragment() {
 
     @Inject lateinit var session: SessionManager
 
-    private val adapter = DebtAdapter { viewModel.deleteDebt(it) }
+    private lateinit var userId: String
+    private val adapter = DebtAdapter(
+        onDelete = { viewModel.deleteDebt(it) },
+        onPayment = { showPaymentDialog(it) }
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentDebtBinding.inflate(inflater, container, false)
@@ -43,7 +49,7 @@ class DebtFragment : Fragment() {
         binding.rvDebts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvDebts.adapter = adapter
 
-        val userId = session.userId ?: return
+        userId = session.userId ?: return
         viewModel.loadDebts(userId)
 
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
@@ -79,6 +85,30 @@ class DebtFragment : Fragment() {
             if (name.isNotEmpty() && balance > 0) {
                 viewModel.addDebt(userId, name, balance, rate, min)
                 dialog.dismiss()
+            }
+        }
+        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showPaymentDialog(debt: DebtEntity) {
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogBinding = DialogMakePaymentBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val sheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        sheet?.setBackgroundResource(android.R.color.transparent)
+
+        dialogBinding.tvPaymentTitle.text = "Pay — ${debt.name}"
+        dialogBinding.tvDebtBalance.text = "Outstanding: R %.2f".format(debt.balance)
+
+        dialogBinding.btnPay.setOnClickListener {
+            val amount = dialogBinding.etAmount.text.toString().toDoubleOrNull()
+            if (amount != null && amount > 0) {
+                viewModel.makePayment(debt, amount)
+                dialog.dismiss()
+            } else {
+                dialogBinding.tilAmount.error = "Enter a valid amount"
             }
         }
         dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }

@@ -18,7 +18,7 @@ import com.budgetbuddy.util.Converters
         BadgeEntity::class,
         NotificationRuleEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

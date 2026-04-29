@@ -118,8 +118,10 @@ class ReportsViewModel @Inject constructor(
                 c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH))
                 c.set(Calendar.HOUR_OF_DAY, 23); c.set(Calendar.MINUTE, 59); c.set(Calendar.SECOND, 59)
                 val end = c.timeInMillis
-                val total = transactionRepository.getTotalExpenseForPeriod(userId, start, end)
-                totals.add(MonthTotal(monthLabels[m], total.toFloat()))
+                val expense = transactionRepository.getTotalExpenseForPeriod(userId, start, end)
+                val income  = transactionRepository.getTotalIncomeForPeriod(userId, start, end)
+                // Chart shows net balance per month (income - expense)
+                totals.add(MonthTotal(monthLabels[m], (income - expense).toFloat()))
             }
             _uiState.update { it.copy(monthlyTotals = totals) }
         }

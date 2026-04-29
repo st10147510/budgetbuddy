@@ -22,6 +22,9 @@ class TransactionRepository @Inject constructor(
     suspend fun getTotalExpenseForPeriod(userId: String, startDate: Long, endDate: Long): Double =
         transactionDao.getTotalExpenseForPeriod(userId, startDate, endDate) ?: 0.0
 
+    suspend fun getTotalIncomeForPeriod(userId: String, startDate: Long, endDate: Long): Double =
+        transactionDao.getTotalIncomeForPeriod(userId, startDate, endDate) ?: 0.0
+
     suspend fun getTotalExpenseByCategoryAndPeriod(userId: String, categoryId: Long, startDate: Long, endDate: Long): Double =
         transactionDao.getTotalExpenseByCategoryAndPeriod(userId, categoryId, startDate, endDate) ?: 0.0
 

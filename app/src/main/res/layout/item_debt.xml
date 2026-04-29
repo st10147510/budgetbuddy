@@ -14,6 +14,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Top row: name + balance + delete -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,5 +73,54 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
+
+        <!-- Progress bar showing payoff progress -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Paid off"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"/>
+
+            <TextView
+                android:id="@+id/tvProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/income_green"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressDebt"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="@color/income_green"
+            android:progressBackgroundTint="@color/divider_light"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Make Payment button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMakePayment"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Make Payment"
+            android:textSize="13sp"
+            android:textColor="@color/background"
+            app:backgroundTint="@color/teal_accent"
+            app:cornerRadius="20dp"/>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

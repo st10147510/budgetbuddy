@@ -71,7 +71,8 @@ class HomeFragment : Fragment() {
                     }
                     Pair(state, items)
                 }.collect { (state, items) ->
-                    binding.tvMonthlyTotal.text = "R %.2f".format(state.totalSpendThisMonth)
+                    // Balance = income − expenses for the current month
+                    binding.tvMonthlyTotal.text = "R %.2f".format(state.balance)
                     adapter.submitList(items)
                     binding.tvEmptyState.visibility =
                         if (state.recentTransactions.isEmpty()) View.VISIBLE else View.GONE

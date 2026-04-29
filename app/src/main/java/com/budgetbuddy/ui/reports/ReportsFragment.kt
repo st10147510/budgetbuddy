@@ -76,8 +76,8 @@ class ReportsFragment : Fragment() {
                     }
                     Pair(state, items)
                 }.collect { (state, items) ->
-                    // Balance
-                    binding.tvBalance.text = "R %.2f".format(state.totalExpense)
+                    // Balance = income − expense for selected month
+                    binding.tvBalance.text = "R %.2f".format(state.balance)
 
                     // Month label
                     binding.tvSelectedMonth.text = SimpleDateFormat("MMM yyyy", Locale.getDefault())

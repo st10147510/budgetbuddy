@@ -96,7 +96,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
-                <!-- Wave decoration lines -->
+                <!-- Wave decoration lines (drawn first so content renders on top) -->
                 <View
                     android:layout_width="260dp"
                     android:layout_height="260dp"
@@ -115,7 +115,17 @@
                     android:layout_marginBottom="-40dp"
                     android:alpha="0.10"/>
 
-                <!-- Card content -->
+                <!-- Coral circle decoration (drawn before content so it stays behind) -->
+                <View
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/bg_shape_oval_coral"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:alpha="0.9"/>
+
+                <!-- Card content (declared last so it draws on top of all decorations) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -166,16 +176,6 @@
                             android:textColor="@color/teal_accent"/>
                     </LinearLayout>
                 </LinearLayout>
-
-                <!-- Coral circle decoration -->
-                <View
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/bg_shape_oval_coral"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginBottom="24dp"
-                    android:alpha="0.9"/>
 
             </androidx.cardview.widget.CardView>
 

@@ -39,11 +39,20 @@
                 android:textColor="@color/text_primary_dark"/>
 
             <TextView
-                android:id="@+id/tvBadgeDate"
+                android:id="@+id/tvBadgeDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:textColor="@color/text_secondary_dark"/>
+                android:textColor="@color/text_secondary_dark"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"/>
+
+            <TextView
+                android:id="@+id/tvBadgeDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/income_green"/>
         </LinearLayout>
 
     </LinearLayout>

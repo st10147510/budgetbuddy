@@ -78,7 +78,7 @@
             app:boxStrokeColor="@color/teal_accent"
             app:hintTextColor="@color/text_secondary"
             app:endIconMode="password_toggle"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="6dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
@@ -86,6 +86,33 @@
                 android:inputType="textPassword"
                 android:textColor="@color/white"/>
         </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Password strength indicator -->
+        <LinearLayout
+            android:id="@+id/layoutPasswordStrength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="10dp">
+
+            <ProgressBar
+                android:id="@+id/progressPasswordStrength"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:max="3"
+                android:progress="0"
+                android:progressTint="@color/red_danger"/>
+
+            <TextView
+                android:id="@+id/tvPasswordStrength"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilConfirmPassword"

@@ -27,10 +27,20 @@ object DatabaseModule {
         db = Room.databaseBuilder(context, BudgetBuddyDatabase::class.java, BudgetBuddyDatabase.DATABASE_NAME)
             .fallbackToDestructiveMigration()
             .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(sqLiteDatabase: SupportSQLiteDatabase) {
-                    super.onCreate(sqLiteDatabase)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        db?.categoryDao()?.insertCategories(BudgetBuddyDatabase.DEFAULT_CATEGORIES)
+                // Single seeding path: fires on every open, seeds only when table is empty.
+                // Using raw SQL for the count avoids re-entering Room while the DB is
+                // still initialising (which can deadlock). The actual insert is deferred
+                // to a coroutine so the onOpen lock is already released before Room is
+                // accessed again via the DAO.
+                override fun onOpen(sqLiteDatabase: SupportSQLiteDatabase) {
+                    super.onOpen(sqLiteDatabase)
+                    val cursor = sqLiteDatabase.query("SELECT COUNT(*) FROM categories")
+                    val isEmpty = cursor.moveToFirst() && cursor.getInt(0) == 0
+                    cursor.close()
+                    if (isEmpty) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            db?.categoryDao()?.insertCategories(BudgetBuddyDatabase.DEFAULT_CATEGORIES)
+                        }
                     }
                 }
             })
