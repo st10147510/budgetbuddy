@@ -23,6 +23,7 @@
     <color name="green_ok">#4CAF50</color>
     <color name="amber_warning">#FF9800</color>
     <color name="red_danger">#F44336</color>
+    <color name="blue_info">#2196F3</color>
 
     <!-- Category colors -->
     <color name="cat_food">#4CAF50</color>

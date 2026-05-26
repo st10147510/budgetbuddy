@@ -1,8 +1,9 @@
 package com.budgetbuddy.ui.budget
 
-import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -31,13 +32,26 @@ class BudgetAdapter(
             binding.tvPercent.text = "${item.progressPercent}%"
             binding.progressBudget.progress = item.progressPercent.coerceIn(0, 100)
 
-            val color = when (item.status) {
-                BudgetStatus.OK -> itemView.context.getColor(R.color.green_ok)
-                BudgetStatus.WARNING -> itemView.context.getColor(R.color.amber_warning)
-                BudgetStatus.EXCEEDED -> itemView.context.getColor(R.color.red_danger)
+            val ctx = itemView.context
+            val (statusColor, chipLabel) = when (item.status) {
+                BudgetStatus.OK       -> ContextCompat.getColor(ctx, R.color.green_ok)   to "On Track"
+                BudgetStatus.WARNING  -> ContextCompat.getColor(ctx, R.color.amber_warning) to "Near Limit"
+                BudgetStatus.EXCEEDED -> ContextCompat.getColor(ctx, R.color.red_danger)  to "Over Limit"
+                BudgetStatus.UNDER_MIN -> ContextCompat.getColor(ctx, R.color.blue_info)  to "Below Goal"
             }
-            binding.tvPercent.setTextColor(color)
-            binding.progressBudget.progressTintList = android.content.res.ColorStateList.valueOf(color)
+
+            binding.tvPercent.setTextColor(statusColor)
+            binding.progressBudget.progressTintList = android.content.res.ColorStateList.valueOf(statusColor)
+
+            binding.tvComplianceChip.text = chipLabel
+            binding.tvComplianceChip.background.setTint(statusColor)
+
+            if (item.budget.minAmount > 0) {
+                binding.tvMinGoal.visibility = View.VISIBLE
+                binding.tvMinGoal.text = "Min goal: R %.2f".format(item.budget.minAmount)
+            } else {
+                binding.tvMinGoal.visibility = View.GONE
+            }
 
             binding.btnDelete.setOnClickListener { onDelete(item) }
         }

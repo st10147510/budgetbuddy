@@ -46,7 +46,31 @@
             android:textColorHint="@color/text_secondary"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Amount -->
+    <!-- Minimum spending goal (optional) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilMinAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Minimum spending goal (optional)"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundColor="@color/surface"
+        app:boxStrokeColor="@color/blue_info"
+        app:hintTextColor="@color/text_secondary"
+        app:prefixText="R "
+        app:prefixTextColor="@color/text_secondary"
+        app:helperText="Alert when you spend below this amount"
+        app:helperTextTextColor="@color/text_secondary"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etMinAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textColor="@color/white"
+            android:textColorHint="@color/text_secondary"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Budget limit -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilAmount"
         android:layout_width="match_parent"

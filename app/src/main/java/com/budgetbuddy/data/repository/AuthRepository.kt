@@ -1,9 +1,9 @@
 package com.budgetbuddy.data.repository
 
 import com.budgetbuddy.data.local.SessionManager
-import com.budgetbuddy.data.local.dao.UserDao
-import com.budgetbuddy.data.local.entities.UserEntity
-import com.budgetbuddy.util.PasswordUtils
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,51 +14,75 @@ sealed class AuthResult {
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val userDao: UserDao,
+    private val firebaseAuth: FirebaseAuth,
     private val sessionManager: SessionManager
 ) {
-    val isLoggedIn: Boolean get() = sessionManager.isLoggedIn
-    val currentUserId: String? get() = sessionManager.userId
-    val currentDisplayName: String? get() = sessionManager.displayName
-    val currentEmail: String? get() = sessionManager.email
+    val isLoggedIn: Boolean get() = firebaseAuth.currentUser != null
+    val currentUserId: String? get() = firebaseAuth.currentUser?.uid
+    val currentDisplayName: String? get() = sessionManager.displayName ?: firebaseAuth.currentUser?.displayName
+    val currentEmail: String? get() = firebaseAuth.currentUser?.email
 
     suspend fun signIn(email: String, password: String): AuthResult {
-        val user = userDao.findByEmail(email.trim().lowercase())
-            ?: return AuthResult.Error("No account found with this email address")
-        if (!PasswordUtils.verify(password, user.passwordHash))
-            return AuthResult.Error("Incorrect password")
-        saveSession(user)
-        return AuthResult.Success(user.id.toString(), user.displayName, user.email)
+        return try {
+            val result = firebaseAuth.signInWithEmailAndPassword(email.trim(), password).await()
+            val user = result.user ?: return AuthResult.Error("Sign in failed. Please try again.")
+            val displayName = user.displayName?.takeIf { it.isNotBlank() }
+                ?: sessionManager.displayName
+                ?: email.substringBefore("@")
+            sessionManager.userId = user.uid
+            sessionManager.displayName = displayName
+            sessionManager.email = user.email ?: email
+            AuthResult.Success(user.uid, displayName, user.email ?: email)
+        } catch (e: Exception) {
+            AuthResult.Error(friendlyError(e.message))
+        }
     }
 
     suspend fun signUp(email: String, password: String, displayName: String): AuthResult {
-        val normalizedEmail = email.trim().lowercase()
-        if (userDao.findByEmail(normalizedEmail) != null)
-            return AuthResult.Error("An account with this email already exists")
-        val user = UserEntity(
-            email = normalizedEmail,
-            passwordHash = PasswordUtils.hash(password),
-            displayName = displayName.trim()
-        )
-        val id = userDao.insertUser(user)
-        val created = user.copy(id = id)
-        saveSession(created)
-        return AuthResult.Success(id.toString(), created.displayName, created.email)
+        return try {
+            val result = firebaseAuth.createUserWithEmailAndPassword(email.trim(), password).await()
+            val user = result.user ?: return AuthResult.Error("Registration failed. Please try again.")
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setDisplayName(displayName.trim())
+                .build()
+            user.updateProfile(profileUpdates).await()
+            sessionManager.userId = user.uid
+            sessionManager.displayName = displayName.trim()
+            sessionManager.email = user.email ?: email
+            AuthResult.Success(user.uid, displayName.trim(), user.email ?: email)
+        } catch (e: Exception) {
+            AuthResult.Error(friendlyError(e.message))
+        }
     }
 
     suspend fun sendPasswordReset(email: String): Result<Unit> {
-        // Local implementation: just verify the account exists
-        return if (userDao.findByEmail(email.trim().lowercase()) != null)
+        return try {
+            firebaseAuth.sendPasswordResetEmail(email.trim()).await()
             Result.success(Unit)
-        else
-            Result.failure(Exception("No account found with this email address"))
+        } catch (e: Exception) {
+            Result.failure(Exception(friendlyError(e.message)))
+        }
     }
 
-    fun signOut() = sessionManager.clear()
+    fun signOut() {
+        firebaseAuth.signOut()
+        sessionManager.clear()
+    }
 
-    private fun saveSession(user: UserEntity) {
-        sessionManager.userId = user.id.toString()
-        sessionManager.displayName = user.displayName
-        sessionManager.email = user.email
+    private fun friendlyError(message: String?): String = when {
+        message == null -> "An error occurred. Please try again."
+        message.contains("no user record") || message.contains("user-not-found") ->
+            "No account found with this email address."
+        message.contains("wrong-password") || message.contains("invalid-credential") ->
+            "Incorrect email or password."
+        message.contains("email-already-in-use") ->
+            "An account with this email already exists."
+        message.contains("weak-password") ->
+            "Password is too weak. Please choose a stronger password."
+        message.contains("network") || message.contains("Network") ->
+            "Network error. Please check your connection."
+        message.contains("too-many-requests") ->
+            "Too many attempts. Please try again later."
+        else -> message
     }
 }

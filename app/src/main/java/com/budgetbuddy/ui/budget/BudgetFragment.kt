@@ -83,9 +83,10 @@ class BudgetFragment : Fragment() {
             }
 
             dialogBinding.btnSave.setOnClickListener {
-                val amount = dialogBinding.etAmount.text.toString().toDoubleOrNull() ?: 0.0
-                if (amount > 0) {
-                    viewModel.saveBudget(userId, selectedCategory.id, amount)
+                val limit = dialogBinding.etAmount.text.toString().toDoubleOrNull() ?: 0.0
+                val min = dialogBinding.etMinAmount.text.toString().toDoubleOrNull() ?: 0.0
+                if (limit > 0) {
+                    viewModel.saveBudget(userId, selectedCategory.id, limit, min)
                     dialog.dismiss()
                 }
             }

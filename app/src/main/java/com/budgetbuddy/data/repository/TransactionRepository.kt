@@ -8,7 +8,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TransactionRepository @Inject constructor(
-    private val transactionDao: TransactionDao
+    private val transactionDao: TransactionDao,
+    private val firestoreRepository: FirestoreRepository
 ) {
     fun getAllTransactions(userId: String): Flow<List<TransactionEntity>> =
         transactionDao.getAllTransactions(userId)
@@ -34,14 +35,21 @@ class TransactionRepository @Inject constructor(
     suspend fun getTransactionCountForDay(userId: String, startOfDay: Long, endOfDay: Long): Int =
         transactionDao.getTransactionCountForDay(userId, startOfDay, endOfDay)
 
-    suspend fun insertTransaction(transaction: TransactionEntity): Long =
-        transactionDao.insertTransaction(transaction)
+    suspend fun insertTransaction(transaction: TransactionEntity): Long {
+        val id = transactionDao.insertTransaction(transaction)
+        firestoreRepository.saveTransaction(transaction.userId, transaction.copy(id = id))
+        return id
+    }
 
-    suspend fun updateTransaction(transaction: TransactionEntity) =
+    suspend fun updateTransaction(transaction: TransactionEntity) {
         transactionDao.updateTransaction(transaction)
+        firestoreRepository.saveTransaction(transaction.userId, transaction)
+    }
 
-    suspend fun deleteTransaction(transaction: TransactionEntity) =
+    suspend fun deleteTransaction(transaction: TransactionEntity) {
         transactionDao.deleteTransaction(transaction)
+        firestoreRepository.deleteTransaction(transaction.userId, transaction.id)
+    }
 
     suspend fun deleteTransactionById(id: Long) =
         transactionDao.deleteTransactionById(id)

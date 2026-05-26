@@ -22,7 +22,7 @@ data class BudgetWithSpend(
     val status: BudgetStatus
 )
 
-enum class BudgetStatus { OK, WARNING, EXCEEDED }
+enum class BudgetStatus { OK, WARNING, EXCEEDED, UNDER_MIN }
 
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
@@ -62,6 +62,7 @@ class BudgetViewModel @Inject constructor(
                     val status = when {
                         pct >= 100 -> BudgetStatus.EXCEEDED
                         pct >= 80  -> BudgetStatus.WARNING
+                        budget.minAmount > 0 && spent < budget.minAmount -> BudgetStatus.UNDER_MIN
                         else       -> BudgetStatus.OK
                     }
                     BudgetWithSpend(budget, category, spent, pct, status)
@@ -70,12 +71,13 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    fun saveBudget(userId: String, categoryId: Long, limitAmount: Double) {
+    fun saveBudget(userId: String, categoryId: Long, limitAmount: Double, minAmount: Double = 0.0) {
         viewModelScope.launch {
             val budget = BudgetEntity(
                 userId = userId,
                 categoryId = categoryId,
                 limitAmount = limitAmount,
+                minAmount = minAmount,
                 month = DateUtils.currentMonth(),
                 year  = DateUtils.currentYear()
             )

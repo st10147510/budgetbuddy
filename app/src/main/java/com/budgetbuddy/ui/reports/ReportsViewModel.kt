@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.local.entities.TransactionType
+import com.budgetbuddy.data.repository.BudgetRepository
 import com.budgetbuddy.data.repository.CategoryRepository
 import com.budgetbuddy.data.repository.TransactionRepository
 import com.budgetbuddy.util.DateUtils
@@ -17,12 +18,22 @@ data class CategorySpend(val name: String, val icon: String, val amount: Double,
 
 data class MonthTotal(val label: String, val total: Float)
 
+data class CategoryBudgetBar(
+    val categoryName: String,
+    val icon: String,
+    val colorHex: String,
+    val spent: Double,
+    val minAmount: Double,
+    val limitAmount: Double
+)
+
 data class ReportsUiState(
     val balance: Double = 0.0,
     val totalExpense: Double = 0.0,
     val totalIncome: Double = 0.0,
     val transactions: List<TransactionEntity> = emptyList(),
     val categorySpends: List<CategorySpend> = emptyList(),
+    val categoryBudgetBars: List<CategoryBudgetBar> = emptyList(),
     val monthlyTotals: List<MonthTotal> = emptyList(),
     val isLoading: Boolean = false
 )
@@ -30,7 +41,8 @@ data class ReportsUiState(
 @HiltViewModel
 class ReportsViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReportsUiState())
@@ -67,39 +79,55 @@ class ReportsViewModel @Inject constructor(
             cal.set(Calendar.HOUR_OF_DAY, 23); cal.set(Calendar.MINUTE, 59); cal.set(Calendar.SECOND, 59)
             val end = cal.timeInMillis
 
-            transactionRepository.getTransactionsByDateRange(userId, start, end).collect { transactions ->
+            // selectedMonth is 0-based (Calendar.MONTH); DB stores months 1-based
+            val dbMonth = selectedMonth + 1
+
+            combine(
+                transactionRepository.getTransactionsByDateRange(userId, start, end),
+                budgetRepository.getBudgetsForMonth(userId, dbMonth, selectedYear)
+            ) { transactions, budgets ->
                 val cats = categoryRepository.getAllCategories().first()
                 val catMap = cats.associateBy { it.id }
+                val budgetMap = budgets.associateBy { it.categoryId }
 
                 val expenses = transactions.filter { it.type == TransactionType.EXPENSE }
-                val incomes = transactions.filter { it.type == TransactionType.INCOME }
+                val incomes  = transactions.filter { it.type == TransactionType.INCOME }
                 val totalExpense = expenses.sumOf { it.amount }
-                val totalIncome = incomes.sumOf { it.amount }
+                val totalIncome  = incomes.sumOf { it.amount }
 
-                val categorySpends = expenses
-                    .groupBy { it.categoryId }
-                    .map { (catId, txs) ->
+                val spendByCat = expenses.groupBy { it.categoryId }
+                    .mapValues { (_, txs) -> txs.sumOf { it.amount } }
+
+                val categorySpends = spendByCat
+                    .map { (catId, amount) ->
                         val cat = catMap[catId]
-                        CategorySpend(
-                            name = cat?.name ?: "Other",
-                            icon = cat?.icon ?: "📦",
-                            amount = txs.sumOf { it.amount },
-                            colorHex = cat?.colorHex ?: "#607D8B"
-                        )
+                        CategorySpend(cat?.name ?: "Other", cat?.icon ?: "📦", amount, cat?.colorHex ?: "#607D8B")
                     }
                     .sortedByDescending { it.amount }
 
-                _uiState.update {
-                    it.copy(
-                        balance = totalIncome - totalExpense,
-                        totalExpense = totalExpense,
-                        totalIncome = totalIncome,
-                        transactions = transactions.sortedByDescending { tx -> tx.date },
-                        categorySpends = categorySpends,
-                        isLoading = false
+                // Only include categories that have a budget set this month
+                val categoryBudgetBars = budgets.map { budget ->
+                    val cat = catMap[budget.categoryId]
+                    CategoryBudgetBar(
+                        categoryName = cat?.name ?: "Other",
+                        icon = cat?.icon ?: "📦",
+                        colorHex = cat?.colorHex ?: "#607D8B",
+                        spent = spendByCat[budget.categoryId] ?: 0.0,
+                        minAmount = budget.minAmount,
+                        limitAmount = budget.limitAmount
                     )
-                }
-            }
+                }.sortedByDescending { it.spent }
+
+                ReportsUiState(
+                    balance = totalIncome - totalExpense,
+                    totalExpense = totalExpense,
+                    totalIncome = totalIncome,
+                    transactions = transactions.sortedByDescending { it.date },
+                    categorySpends = categorySpends,
+                    categoryBudgetBars = categoryBudgetBars,
+                    isLoading = false
+                )
+            }.collect { newState -> _uiState.update { newState } }
         }
     }
 

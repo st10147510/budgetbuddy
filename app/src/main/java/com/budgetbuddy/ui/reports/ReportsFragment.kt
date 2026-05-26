@@ -20,9 +20,14 @@ import com.budgetbuddy.databinding.FragmentReportsBinding
 import com.budgetbuddy.ui.expense.TransactionAdapter
 import com.budgetbuddy.ui.expense.TransactionWithCategory
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -61,6 +66,7 @@ class ReportsFragment : Fragment() {
         binding.rvTransactions.adapter = transactionAdapter
 
         setupLineChart()
+        setupBudgetBarChart()
         setupMonthPicker()
 
         val userId = session.userId ?: return
@@ -87,6 +93,9 @@ class ReportsFragment : Fragment() {
 
                     // Line chart
                     if (state.monthlyTotals.isNotEmpty()) updateLineChart(state.monthlyTotals)
+
+                    // Budget bar chart
+                    updateBudgetBarChart(state.categoryBudgetBars)
 
                     // Transactions
                     transactionAdapter.submitList(items)
@@ -164,6 +173,103 @@ class ReportsFragment : Fragment() {
         selectedMonthIndex = monthIndex
         selectedYear = year
         viewModel.selectMonth(monthIndex, year)
+    }
+
+    private fun setupBudgetBarChart() {
+        binding.budgetBarChart.apply {
+            description.isEnabled = false
+            legend.isEnabled = false
+            setTouchEnabled(false)
+            setDrawGridBackground(false)
+            setBackgroundColor(Color.TRANSPARENT)
+            setNoDataText("")
+            setPinchZoom(false)
+            setDoubleTapToZoomEnabled(false)
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                setCenterAxisLabels(true)
+                granularity = 1f
+                textColor = Color.parseColor("#888888")
+                textSize = 10f
+            }
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = Color.parseColor("#1A000000")
+                axisMinimum = 0f
+                textColor = Color.parseColor("#888888")
+                textSize = 10f
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float) = "R${value.toInt()}"
+                }
+            }
+            axisRight.isEnabled = false
+        }
+    }
+
+    private fun updateBudgetBarChart(bars: List<CategoryBudgetBar>) {
+        if (bars.isEmpty()) {
+            binding.budgetBarChart.visibility = View.GONE
+            binding.budgetChartLegend.visibility = View.GONE
+            binding.tvBudgetChartEmpty.visibility = View.VISIBLE
+            return
+        }
+        binding.budgetBarChart.visibility = View.VISIBLE
+        binding.budgetChartLegend.visibility = View.VISIBLE
+        binding.tvBudgetChartEmpty.visibility = View.GONE
+
+        val displayBars = bars.take(6)
+
+        val limitEntries = displayBars.mapIndexed { i, bar ->
+            BarEntry(i.toFloat(), bar.limitAmount.toFloat().coerceAtLeast(bar.spent.toFloat()))
+        }
+        val spentEntries = displayBars.mapIndexed { i, bar ->
+            BarEntry(i.toFloat(), bar.spent.toFloat())
+        }
+
+        val limitDataSet = BarDataSet(limitEntries, "Limit").apply {
+            color = Color.parseColor("#336EDCD3")
+            setDrawValues(false)
+        }
+
+        val spentDataSet = BarDataSet(spentEntries, "Spent").apply {
+            colors = displayBars.map { bar ->
+                val pct = if (bar.limitAmount > 0) (bar.spent / bar.limitAmount * 100).toInt() else 0
+                when {
+                    pct >= 100 -> Color.parseColor("#F44336")
+                    pct >= 80  -> Color.parseColor("#FF9800")
+                    bar.minAmount > 0 && bar.spent < bar.minAmount -> Color.parseColor("#2196F3")
+                    else -> Color.parseColor("#4CAF50")
+                }
+            }
+            setDrawValues(true)
+            valueTextSize = 9f
+            valueTextColor = Color.parseColor("#555555")
+            valueFormatter = object : ValueFormatter() {
+                override fun getBarLabel(barEntry: BarEntry) =
+                    if (barEntry.y > 0) "R${barEntry.y.toInt()}" else ""
+            }
+        }
+
+        val groupSpace = 0.2f
+        val barSpace  = 0.05f
+        val barWidth  = 0.35f // (0.35 + 0.05) * 2 + 0.2 = 1.0
+
+        val barData = BarData(limitDataSet, spentDataSet).apply { this.barWidth = barWidth }
+
+        val labels = displayBars.map { bar ->
+            val minTag = if (bar.minAmount > 0) "\n≥R${bar.minAmount.toInt()}" else ""
+            "${bar.icon} ${bar.categoryName.take(7)}$minTag"
+        }
+
+        binding.budgetBarChart.apply {
+            data = barData
+            xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+            xAxis.axisMinimum = 0f
+            xAxis.axisMaximum = barData.getGroupWidth(groupSpace, barSpace) * displayBars.size
+            groupBars(0f, groupSpace, barSpace)
+            invalidate()
+        }
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

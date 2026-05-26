@@ -70,6 +70,15 @@
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary_dark"/>
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvMinGoal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/blue_info"
+                    android:visibility="gone"
+                    android:layout_marginTop="2dp"/>
             </LinearLayout>
 
             <TextView
@@ -97,5 +106,17 @@
             android:max="100"
             android:progressTint="@color/teal_accent"
             android:progressBackgroundTint="@color/divider_light"/>
+
+        <TextView
+            android:id="@+id/tvComplianceChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_compliance_chip"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

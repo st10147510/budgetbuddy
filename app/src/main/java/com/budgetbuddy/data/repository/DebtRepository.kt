@@ -16,14 +16,34 @@ data class DebtPayoffMonth(
 )
 
 @Singleton
-class DebtRepository @Inject constructor(private val debtDao: DebtDao) {
+class DebtRepository @Inject constructor(
+    private val debtDao: DebtDao,
+    private val firestoreRepository: FirestoreRepository
+) {
 
     fun getActiveDebts(userId: String): Flow<List<DebtEntity>> = debtDao.getActiveDebts(userId)
     fun getAllDebts(userId: String): Flow<List<DebtEntity>> = debtDao.getAllDebts(userId)
-    suspend fun insertDebt(debt: DebtEntity): Long = debtDao.insertDebt(debt)
-    suspend fun updateDebt(debt: DebtEntity) = debtDao.updateDebt(debt)
-    suspend fun deleteDebt(debt: DebtEntity) = debtDao.deleteDebt(debt)
-    suspend fun markDebtPaidOff(id: Long) = debtDao.markDebtPaidOff(id)
+
+    suspend fun insertDebt(debt: DebtEntity): Long {
+        val id = debtDao.insertDebt(debt)
+        firestoreRepository.saveDebt(debt.userId, debt.copy(id = id))
+        return id
+    }
+
+    suspend fun updateDebt(debt: DebtEntity) {
+        debtDao.updateDebt(debt)
+        firestoreRepository.saveDebt(debt.userId, debt)
+    }
+
+    suspend fun deleteDebt(debt: DebtEntity) {
+        debtDao.deleteDebt(debt)
+        firestoreRepository.deleteDebt(debt.userId, debt.id)
+    }
+
+    suspend fun markDebtPaidOff(id: Long) {
+        debtDao.markDebtPaidOff(id)
+        debtDao.getDebtById(id)?.let { firestoreRepository.saveDebt(it.userId, it.copy(isPaidOff = true)) }
+    }
 
     /**
      * Compute payoff schedule for a list of debts using snowball or avalanche strategy.

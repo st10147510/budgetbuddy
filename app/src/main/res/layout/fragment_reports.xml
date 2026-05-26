@@ -82,6 +82,108 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="20dp"/>
 
+            <!-- Budget vs Spend section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Budget vs Spend"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary_dark"
+                android:layout_marginBottom="8dp"/>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/budgetBarChart"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"/>
+
+            <!-- Chart legend -->
+            <LinearLayout
+                android:id="@+id/budgetChartLegend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="#336EDCD3"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="4dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Limit"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary_dark"
+                    android:layout_marginEnd="14dp"/>
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@color/green_ok"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="4dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="On Track"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary_dark"
+                    android:layout_marginEnd="14dp"/>
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@color/amber_warning"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="4dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Near Limit"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary_dark"
+                    android:layout_marginEnd="14dp"/>
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@color/red_danger"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="4dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Over"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary_dark"/>
+
+            </LinearLayout>
+
+            <!-- No budgets empty state -->
+            <TextView
+                android:id="@+id/tvBudgetChartEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set budgets to see spending comparison"
+                android:textColor="@color/text_secondary_dark"
+                android:gravity="center"
+                android:paddingVertical="20dp"
+                android:visibility="visible"/>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_light"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"/>
+
             <!-- Heading row -->
             <LinearLayout
                 android:layout_width="match_parent"

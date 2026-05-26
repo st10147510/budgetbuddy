@@ -21,7 +21,8 @@ data class BudgetEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val userId: String,
     val categoryId: Long,
-    val limitAmount: Double,
+    val minAmount: Double = 0.0,   // minimum spending goal for this category
+    val limitAmount: Double,        // maximum spending limit for this category
     val month: Int,   // 1–12
     val year: Int,
     val createdAt: Long = System.currentTimeMillis()
