@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -19,9 +20,25 @@ android {
         testInstrumentationRunner = "com.budgetbuddy.HiltTestRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_PATH")
+            val keyAlias     = System.getenv("KEY_ALIAS")
+            val keyPassword  = System.getenv("KEY_PASSWORD")
+            val storePassword = System.getenv("KEY_STORE_PASSWORD")
+            if (!keystorePath.isNullOrEmpty() && !keyAlias.isNullOrEmpty()) {
+                storeFile        = file(keystorePath)
+                this.keyAlias    = keyAlias
+                this.keyPassword = keyPassword
+                this.storePassword = storePassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
@@ -90,6 +107,13 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
