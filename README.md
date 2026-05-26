@@ -4,7 +4,8 @@ A personal finance Android app for tracking expenses, managing budgets, monitori
 
 ## Video Demo
 
-[Watch the demo on YouTube](https://youtu.be/lt0lGFa9MV8)
+[PART 2 - Watch the demo on YouTube](https://youtu.be/lt0lGFa9MV8)
+[PART 3 - Watch the demo on YouTube](https://youtu.be/XXX)
 
 > The video walks through all app features with a voice-over explaining the implementation.
 
@@ -22,13 +23,14 @@ To build it yourself:
 ## Features
 
 - **Expense Tracking** — Log income and expenses with categories, notes, and dates
-- **Budgets** — Set spending limits per category with real-time status (OK / WARNING / EXCEEDED)
+- **Budgets** — Set per-category spending limits and minimum spending goals; real-time compliance status (On Track / Near Limit / Over Limit / Below Goal)
 - **Savings Goals** — Track progress toward financial goals
-- **Debt Management** — Monitor debts with payoff schedules and strategy selection
-- **Reports** — Monthly spending charts and category breakdowns via MPAndroidChart
+- **Debt Management** — Monitor debts with payoff schedules and strategy selection (Snowball / Avalanche)
+- **Reports** — Monthly line chart of net balance, grouped bar chart of budget vs actual spend per category, and a full transaction list — all filterable by month
 - **Gamification** — Earn badges for milestones (first transaction, 7-day streak)
 - **Notifications** — Budget alert workers and daily reminders via WorkManager
-- **Offline-first** — All data persisted locally with Room
+- **Offline-first** — Room database with write-through sync to Firestore on every save/update/delete
+- **Cloud Auth** — Firebase Authentication (email/password) with friendly error messages and password reset
 
 ## Tech Stack
 
@@ -38,7 +40,8 @@ To build it yourself:
 | UI | Fragments, ViewBinding, Navigation Component |
 | Architecture | Single-Activity MVVM, StateFlow, Hilt DI |
 | Local DB | Room 2.6.1 (`budget_buddy.db`) |
-| Auth | Authentication (email/password) |
+| Auth | Firebase Authentication (email/password) |
+| Cloud DB | Firebase Firestore (write-through sync) |
 | Charts | MPAndroidChart 3.1.0 |
 | Background | WorkManager 2.9.1 |
 | Preferences | DataStore 1.1.1 |
@@ -88,6 +91,63 @@ Fragment → ViewModel (StateFlow) → Repository → Room DAO (Flow)
 - ViewModels are `@HiltViewModel` injected — never reference DAOs directly
 - Aggregate queries (monthly totals, category spend) live in `TransactionDao` — never computed in-memory
 - `BadgeRepository.checkAndAwardBadges()` is called after every transaction save (idempotent)
+
+## Custom Features
+
+### 1. Budget Minimum Spending Goals
+
+Beyond a standard spending *limit*, each budget can also carry a *minimum spending goal* — useful for categories like Savings or Education where underspending is just as problematic as overspending.
+
+**How it works:**
+
+When creating a budget (bottom sheet on the Budget screen), two amount fields are shown:
+
+| Field | Purpose |
+|---|---|
+| Minimum spending goal *(optional)* | Alert when monthly spend falls below this amount |
+| Budget limit | Alert when monthly spend approaches or exceeds this amount |
+
+Each budget card in the list shows a compliance chip whose colour and label reflect the current status:
+
+| Status | Colour | Condition |
+|---|---|---|
+| On Track | Green | spend ≥ min goal and < 80 % of limit |
+| Near Limit | Amber | spend ≥ 80 % of limit |
+| Over Limit | Red | spend ≥ limit |
+| Below Goal | Blue | spend < min goal (and not already Near Limit / Over Limit) |
+
+When `minAmount > 0`, the card also shows a "Min goal: R X.XX" label beneath the category name.
+
+**Key files:**
+
+- `BudgetEntity.kt` — `minAmount` field (default 0.0)
+- `BudgetViewModel.kt` — `BudgetStatus` enum with `UNDER_MIN`; status computed in `loadBudgets()`
+- `dialog_add_budget.xml` — min amount `TextInputLayout` with blue stroke and helper text
+- `item_budget.xml` + `BudgetAdapter.kt` — compliance chip and min goal label
+- `FirestoreRepository.kt` — `minAmount` included in Firestore document on every save
+
+---
+
+### 2. Category Budget vs Spend Bar Chart (Reports)
+
+The Reports screen includes a grouped bar chart that visually compares actual spending against the budget limit for every category that has a budget set in the selected month.
+
+**What the chart shows:**
+
+- **Teal bar (Limit)** — the budget ceiling for the category; extends to at least the spent amount so the chart never clips
+- **Coloured bar (Spent)** — actual spend, coloured by the same compliance system as the budget list (green / amber / red / blue)
+- **X-axis labels** — category icon + name; if a minimum spending goal is set, the label also shows `≥R<amount>` as a reminder
+- **Y-axis** — formatted as `R<amount>`; up to 6 categories displayed (sorted by spend descending)
+
+The chart is reactive: it updates whenever transactions or budgets change, and collapses to an empty-state message ("Set budgets to see spending comparison") when no budgets exist for the selected month.
+
+**Key files:**
+
+- `ReportsViewModel.kt` — `CategoryBudgetBar` data class; `BudgetRepository` injected; `loadSelectedMonth()` uses `combine()` on transaction + budget flows to build `categoryBudgetBars`
+- `fragment_reports.xml` — `BarChart` view (200 dp) with legend row and empty state
+- `ReportsFragment.kt` — `setupBudgetBarChart()` / `updateBudgetBarChart()` using MPAndroidChart grouped `BarData` with two `BarDataSet`s
+
+---
 
 ## Getting Started
 
@@ -170,11 +230,13 @@ Two navigation regions in `nav_graph.xml`:
 
 ## Database
 
-Room database `budget_buddy.db` (version 1).
+Room database `budget_buddy.db` (version 4).
 
 Enums (`TransactionType`, `BadgeType`, `NotificationType`, `PayoffStrategy`) stored as strings via `Converters.kt`.
 
 Ten default categories are seeded in `BudgetBuddyDatabase.Callback.onCreate`.
+
+The database is configured with `fallbackToDestructiveMigration()` — schema changes during development wipe and reseed the local DB. Cloud data in Firestore is unaffected.
 
 ## License
 
