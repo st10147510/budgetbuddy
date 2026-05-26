@@ -12,12 +12,14 @@ import org.mockito.kotlin.*
 class GoalRepositoryTest {
 
     private lateinit var goalDao: GoalDao
+    private lateinit var firestoreRepository: FirestoreRepository
     private lateinit var repository: GoalRepository
 
     @Before
     fun setup() {
         goalDao = mock()
-        repository = GoalRepository(goalDao)
+        firestoreRepository = mock()
+        repository = GoalRepository(goalDao, firestoreRepository)
     }
 
     private fun goal(id: Long, target: Double, saved: Double, completed: Boolean = false) =

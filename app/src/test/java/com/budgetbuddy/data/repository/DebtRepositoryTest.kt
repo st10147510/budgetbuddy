@@ -13,12 +13,14 @@ import org.mockito.kotlin.*
 class DebtRepositoryTest {
 
     private lateinit var debtDao: DebtDao
+    private lateinit var firestoreRepository: FirestoreRepository
     private lateinit var repository: DebtRepository
 
     @Before
     fun setup() {
         debtDao = mock()
-        repository = DebtRepository(debtDao)
+        firestoreRepository = mock()
+        repository = DebtRepository(debtDao, firestoreRepository)
     }
 
     private fun debt(id: Long, name: String, balance: Double, rate: Double, minPayment: Double) =
