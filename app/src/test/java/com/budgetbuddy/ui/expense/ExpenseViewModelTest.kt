@@ -6,6 +6,7 @@ import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.BadgeRepository
 import com.budgetbuddy.data.repository.CategoryRepository
+import com.budgetbuddy.data.repository.StorageRepository
 import com.budgetbuddy.data.repository.TransactionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +29,7 @@ class ExpenseViewModelTest {
     private lateinit var transactionRepository: TransactionRepository
     private lateinit var categoryRepository: CategoryRepository
     private lateinit var badgeRepository: BadgeRepository
+    private lateinit var storageRepository: StorageRepository
     private lateinit var viewModel: ExpenseViewModel
 
     @Before
@@ -36,8 +38,9 @@ class ExpenseViewModelTest {
         transactionRepository = mock()
         categoryRepository = mock()
         badgeRepository = mock()
+        storageRepository = mock()
         whenever(categoryRepository.getAllCategories()).thenReturn(flowOf(emptyList()))
-        viewModel = ExpenseViewModel(transactionRepository, categoryRepository, badgeRepository)
+        viewModel = ExpenseViewModel(transactionRepository, categoryRepository, badgeRepository, storageRepository)
     }
 
     @After
