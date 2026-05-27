@@ -1,7 +1,10 @@
 package com.budgetbuddy.data.repository
 
 import android.util.Log
+import com.budgetbuddy.data.local.entities.BadgeEntity
+import com.budgetbuddy.data.local.entities.BadgeType
 import com.budgetbuddy.data.local.entities.BudgetEntity
+import com.budgetbuddy.data.local.entities.CategoryEntity
 import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.data.local.entities.GoalEntity
 import com.budgetbuddy.data.local.entities.TransactionEntity
@@ -17,28 +20,22 @@ private const val TAG = "FirestoreRepo"
 class FirestoreRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
-    private fun userDoc(userId: String) = firestore.collection("users").document(userId)
-    private fun txCol(userId: String) = userDoc(userId).collection("transactions")
-    private fun budgetCol(userId: String) = userDoc(userId).collection("budgets")
-    private fun goalCol(userId: String) = userDoc(userId).collection("goals")
-    private fun debtCol(userId: String) = userDoc(userId).collection("debts")
+    private fun userDoc(userId: String)      = firestore.collection("users").document(userId)
+    private fun txCol(userId: String)        = userDoc(userId).collection("transactions")
+    private fun budgetCol(userId: String)    = userDoc(userId).collection("budgets")
+    private fun goalCol(userId: String)      = userDoc(userId).collection("goals")
+    private fun debtCol(userId: String)      = userDoc(userId).collection("debts")
+    private fun categoryCol(userId: String)  = userDoc(userId).collection("categories")
+    private fun badgeCol(userId: String)     = userDoc(userId).collection("badges")
 
     // ─── Transactions ────────────────────────────────────────────────────────
 
     suspend fun saveTransaction(userId: String, entity: TransactionEntity) {
-        try {
-            txCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
-        } catch (e: Exception) {
-            Log.w(TAG, "saveTransaction failed: ${e.message}")
-        }
+        txCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
     }
 
     suspend fun deleteTransaction(userId: String, id: Long) {
-        try {
-            txCol(userId).document(id.toString()).delete().await()
-        } catch (e: Exception) {
-            Log.w(TAG, "deleteTransaction failed: ${e.message}")
-        }
+        txCol(userId).document(id.toString()).delete().await()
     }
 
     suspend fun getTransactions(userId: String): List<TransactionEntity> {
@@ -53,19 +50,11 @@ class FirestoreRepository @Inject constructor(
     // ─── Budgets ─────────────────────────────────────────────────────────────
 
     suspend fun saveBudget(userId: String, entity: BudgetEntity) {
-        try {
-            budgetCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
-        } catch (e: Exception) {
-            Log.w(TAG, "saveBudget failed: ${e.message}")
-        }
+        budgetCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
     }
 
     suspend fun deleteBudget(userId: String, id: Long) {
-        try {
-            budgetCol(userId).document(id.toString()).delete().await()
-        } catch (e: Exception) {
-            Log.w(TAG, "deleteBudget failed: ${e.message}")
-        }
+        budgetCol(userId).document(id.toString()).delete().await()
     }
 
     suspend fun getBudgets(userId: String): List<BudgetEntity> {
@@ -80,19 +69,11 @@ class FirestoreRepository @Inject constructor(
     // ─── Goals ────────────────────────────────────────────────────────────────
 
     suspend fun saveGoal(userId: String, entity: GoalEntity) {
-        try {
-            goalCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
-        } catch (e: Exception) {
-            Log.w(TAG, "saveGoal failed: ${e.message}")
-        }
+        goalCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
     }
 
     suspend fun deleteGoal(userId: String, id: Long) {
-        try {
-            goalCol(userId).document(id.toString()).delete().await()
-        } catch (e: Exception) {
-            Log.w(TAG, "deleteGoal failed: ${e.message}")
-        }
+        goalCol(userId).document(id.toString()).delete().await()
     }
 
     suspend fun getGoals(userId: String): List<GoalEntity> {
@@ -107,19 +88,11 @@ class FirestoreRepository @Inject constructor(
     // ─── Debts ────────────────────────────────────────────────────────────────
 
     suspend fun saveDebt(userId: String, entity: DebtEntity) {
-        try {
-            debtCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
-        } catch (e: Exception) {
-            Log.w(TAG, "saveDebt failed: ${e.message}")
-        }
+        debtCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
     }
 
     suspend fun deleteDebt(userId: String, id: Long) {
-        try {
-            debtCol(userId).document(id.toString()).delete().await()
-        } catch (e: Exception) {
-            Log.w(TAG, "deleteDebt failed: ${e.message}")
-        }
+        debtCol(userId).document(id.toString()).delete().await()
     }
 
     suspend fun getDebts(userId: String): List<DebtEntity> {
@@ -128,6 +101,65 @@ class FirestoreRepository @Inject constructor(
         } catch (e: Exception) {
             Log.w(TAG, "getDebts failed: ${e.message}")
             emptyList()
+        }
+    }
+
+    // ─── Categories ──────────────────────────────────────────────────────────
+
+    suspend fun saveCategory(userId: String, entity: CategoryEntity) {
+        categoryCol(userId).document(entity.id.toString()).set(entity.toMap()).await()
+    }
+
+    suspend fun deleteCategory(userId: String, id: Long) {
+        categoryCol(userId).document(id.toString()).delete().await()
+    }
+
+    suspend fun getCategories(userId: String): List<CategoryEntity> {
+        return try {
+            categoryCol(userId).get().await().documents.mapNotNull { it.toCategory() }
+        } catch (e: Exception) {
+            Log.w(TAG, "getCategories failed: ${e.message}")
+            emptyList()
+        }
+    }
+
+    // ─── Badges ──────────────────────────────────────────────────────────────
+
+    suspend fun saveBadge(userId: String, entity: BadgeEntity) {
+        badgeCol(userId).document(entity.badgeType.name).set(entity.toMap()).await()
+    }
+
+    suspend fun getBadges(userId: String): List<BadgeEntity> {
+        return try {
+            badgeCol(userId).get().await().documents.mapNotNull { it.toBadge(userId) }
+        } catch (e: Exception) {
+            Log.w(TAG, "getBadges failed: ${e.message}")
+            emptyList()
+        }
+    }
+
+    // ─── User Profile ─────────────────────────────────────────────────────────
+
+    suspend fun saveUserProfile(userId: String, displayName: String, email: String, photoUrl: String? = null) {
+        try {
+            val data = buildMap<String, Any> {
+                put("displayName", displayName)
+                put("email", email)
+                put("updatedAt", System.currentTimeMillis())
+                photoUrl?.let { put("photoUrl", it) }
+            }
+            userDoc(userId).set(data).await()
+        } catch (e: Exception) {
+            Log.w(TAG, "saveUserProfile failed: ${e.message}")
+        }
+    }
+
+    suspend fun getUserPhotoUrl(userId: String): String? {
+        return try {
+            userDoc(userId).get().await().getString("photoUrl")
+        } catch (e: Exception) {
+            Log.w(TAG, "getUserPhotoUrl failed: ${e.message}")
+            null
         }
     }
 
@@ -243,6 +275,47 @@ class FirestoreRepository @Inject constructor(
                 minimumPayment = getDouble("minimumPayment") ?: 0.0,
                 isPaidOff = getBoolean("isPaidOff") ?: false,
                 createdAt = getLong("createdAt") ?: System.currentTimeMillis()
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun CategoryEntity.toMap() = mapOf(
+        "id" to id,
+        "name" to name,
+        "icon" to icon,
+        "colorHex" to colorHex,
+        "isDefault" to isDefault
+    )
+
+    private fun com.google.firebase.firestore.DocumentSnapshot.toCategory(): CategoryEntity? {
+        return try {
+            CategoryEntity(
+                id = getLong("id") ?: 0L,
+                name = getString("name") ?: "",
+                icon = getString("icon") ?: "📦",
+                colorHex = getString("colorHex") ?: "#607D8B",
+                isDefault = getBoolean("isDefault") ?: false
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun BadgeEntity.toMap() = mapOf(
+        "userId" to userId,
+        "badgeType" to badgeType.name,
+        "earnedAt" to earnedAt
+    )
+
+    private fun com.google.firebase.firestore.DocumentSnapshot.toBadge(userId: String): BadgeEntity? {
+        return try {
+            BadgeEntity(
+                id = 0,
+                userId = userId,
+                badgeType = BadgeType.valueOf(getString("badgeType") ?: return null),
+                earnedAt = getLong("earnedAt") ?: System.currentTimeMillis()
             )
         } catch (e: Exception) {
             null

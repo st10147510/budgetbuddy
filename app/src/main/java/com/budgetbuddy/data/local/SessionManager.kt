@@ -26,6 +26,11 @@ class SessionManager @Inject constructor(
         set(value) = if (value != null) prefs.edit().putString("email", value).apply()
                      else prefs.edit().remove("email").apply()
 
+    var photoUrl: String?
+        get() = prefs.getString("photoUrl", null)
+        set(value) = if (value != null) prefs.edit().putString("photoUrl", value).apply()
+                     else prefs.edit().remove("photoUrl").apply()
+
     val isLoggedIn: Boolean get() = userId != null
 
     fun clear() = prefs.edit().clear().apply()
