@@ -10,6 +10,9 @@ interface GoalDao {
     @Query("SELECT * FROM goals WHERE userId = :userId ORDER BY createdAt DESC")
     fun getGoals(userId: String): Flow<List<GoalEntity>>
 
+    @Query("SELECT * FROM goals WHERE userId = :userId ORDER BY createdAt DESC")
+    suspend fun getAllGoalsOnce(userId: String): List<GoalEntity>
+
     @Query("SELECT * FROM goals WHERE id = :id")
     suspend fun getGoalById(id: Long): GoalEntity?
 

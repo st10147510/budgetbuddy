@@ -11,6 +11,9 @@ interface BadgeDao {
     @Query("SELECT * FROM badges WHERE userId = :userId ORDER BY earnedAt DESC")
     fun getBadges(userId: String): Flow<List<BadgeEntity>>
 
+    @Query("SELECT * FROM badges WHERE userId = :userId ORDER BY earnedAt DESC")
+    suspend fun getAllBadgesOnce(userId: String): List<BadgeEntity>
+
     @Query("SELECT * FROM badges WHERE userId = :userId AND badgeType = :type LIMIT 1")
     suspend fun getBadgeByType(userId: String, type: BadgeType): BadgeEntity?
 

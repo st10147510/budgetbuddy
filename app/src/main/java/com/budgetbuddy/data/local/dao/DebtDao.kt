@@ -13,6 +13,9 @@ interface DebtDao {
     @Query("SELECT * FROM debts WHERE userId = :userId ORDER BY createdAt DESC")
     fun getAllDebts(userId: String): Flow<List<DebtEntity>>
 
+    @Query("SELECT * FROM debts WHERE userId = :userId ORDER BY createdAt DESC")
+    suspend fun getAllDebtsOnce(userId: String): List<DebtEntity>
+
     @Query("SELECT * FROM debts WHERE id = :id")
     suspend fun getDebtById(id: Long): DebtEntity?
 

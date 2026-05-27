@@ -16,6 +16,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE isDefault = 1")
     suspend fun getDefaultCategories(): List<CategoryEntity>
 
+    @Query("SELECT * FROM categories WHERE isDefault = 0")
+    suspend fun getNonDefaultCategories(): List<CategoryEntity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCategory(category: CategoryEntity): Long
 

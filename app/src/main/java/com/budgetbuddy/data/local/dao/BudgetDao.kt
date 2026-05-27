@@ -22,6 +22,9 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets WHERE userId = :userId AND month = :month AND year = :year")
     suspend fun getBudgetsForMonthOnce(userId: String, month: Int, year: Int): List<BudgetEntity>
 
+    @Query("SELECT * FROM budgets WHERE userId = :userId")
+    suspend fun getAllBudgetsOnce(userId: String): List<BudgetEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateBudget(budget: BudgetEntity): Long
 
