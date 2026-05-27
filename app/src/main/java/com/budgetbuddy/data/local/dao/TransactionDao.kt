@@ -85,6 +85,9 @@ interface TransactionDao {
     """)
     suspend fun getTransactionCountForDay(userId: String, startOfDay: Long, endOfDay: Long): Int
 
+    @Query("SELECT * FROM transactions WHERE userId = :userId ORDER BY date DESC")
+    suspend fun getAllTransactionsOnce(userId: String): List<TransactionEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionEntity): Long
 
