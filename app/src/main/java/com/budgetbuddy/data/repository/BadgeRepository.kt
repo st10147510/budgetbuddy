@@ -27,14 +27,17 @@ class BadgeRepository @Inject constructor(
     private val transactionDao: TransactionDao,
     private val budgetDao: BudgetDao,
     private val goalDao: GoalDao,
-    private val debtDao: DebtDao
+    private val debtDao: DebtDao,
+    private val firestoreRepository: FirestoreRepository
 ) {
     fun getBadges(userId: String): Flow<List<BadgeEntity>> = badgeDao.getBadges(userId)
 
     private suspend fun awardBadge(userId: String, type: BadgeType) {
-        // Only award (and notify) if this badge hasn't been earned before
         if (badgeDao.getBadgeByType(userId, type) == null) {
-            badgeDao.insertBadge(BadgeEntity(userId = userId, badgeType = type))
+            val badge = BadgeEntity(userId = userId, badgeType = type)
+            badgeDao.insertBadge(badge)
+            try { firestoreRepository.saveBadge(userId, badge) }
+            catch (e: Exception) { Log.w("BadgeRepository", "saveBadge failed: ${e.message}") }
             showBadgeNotification(type)
             Log.i("BadgeRepository", "Badge awarded: ${type.name}")
         }

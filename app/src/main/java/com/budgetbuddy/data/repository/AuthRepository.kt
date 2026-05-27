@@ -1,11 +1,18 @@
 package com.budgetbuddy.data.repository
 
+import android.net.Uri
+import android.util.Log
 import com.budgetbuddy.data.local.SessionManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "AuthRepository"
 
 sealed class AuthResult {
     data class Success(val userId: String, val displayName: String, val email: String) : AuthResult()
@@ -15,12 +22,15 @@ sealed class AuthResult {
 @Singleton
 class AuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val syncRepository: SyncRepository,
+    private val firestoreRepository: FirestoreRepository
 ) {
     val isLoggedIn: Boolean get() = firebaseAuth.currentUser != null
     val currentUserId: String? get() = firebaseAuth.currentUser?.uid
     val currentDisplayName: String? get() = sessionManager.displayName ?: firebaseAuth.currentUser?.displayName
     val currentEmail: String? get() = firebaseAuth.currentUser?.email
+    val currentPhotoUrl: String? get() = sessionManager.photoUrl ?: firebaseAuth.currentUser?.photoUrl?.toString()
 
     suspend fun signIn(email: String, password: String): AuthResult {
         return try {
@@ -32,6 +42,13 @@ class AuthRepository @Inject constructor(
             sessionManager.userId = user.uid
             sessionManager.displayName = displayName
             sessionManager.email = user.email ?: email
+            CoroutineScope(Dispatchers.IO).launch {
+                syncRepository.syncToFirestore(user.uid)
+                syncRepository.syncFromFirestore(user.uid)
+                val photoUrl = firestoreRepository.getUserPhotoUrl(user.uid)
+                    ?: user.photoUrl?.toString()
+                if (photoUrl != null) sessionManager.photoUrl = photoUrl
+            }
             AuthResult.Success(user.uid, displayName, user.email ?: email)
         } catch (e: Exception) {
             AuthResult.Error(friendlyError(e.message))
@@ -49,6 +66,9 @@ class AuthRepository @Inject constructor(
             sessionManager.userId = user.uid
             sessionManager.displayName = displayName.trim()
             sessionManager.email = user.email ?: email
+            CoroutineScope(Dispatchers.IO).launch {
+                firestoreRepository.saveUserProfile(user.uid, displayName.trim(), user.email ?: email)
+            }
             AuthResult.Success(user.uid, displayName.trim(), user.email ?: email)
         } catch (e: Exception) {
             AuthResult.Error(friendlyError(e.message))
@@ -61,6 +81,24 @@ class AuthRepository @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception(friendlyError(e.message)))
+        }
+    }
+
+    suspend fun updatePhotoUrl(userId: String, photoUrl: String) {
+        try {
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setPhotoUri(Uri.parse(photoUrl))
+                .build()
+            firebaseAuth.currentUser?.updateProfile(profileUpdates)?.await()
+            firestoreRepository.saveUserProfile(
+                userId,
+                sessionManager.displayName ?: "",
+                sessionManager.email ?: "",
+                photoUrl
+            )
+            sessionManager.photoUrl = photoUrl
+        } catch (e: Exception) {
+            Log.w(TAG, "updatePhotoUrl failed: ${e.message}")
         }
     }
 

@@ -1,5 +1,6 @@
 package com.budgetbuddy.data.repository
 
+import android.util.Log
 import com.budgetbuddy.data.local.dao.DebtDao
 import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.data.local.entities.PayoffStrategy
@@ -7,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "DebtRepo"
 
 data class DebtPayoffMonth(
     val month: Int,
@@ -26,23 +29,27 @@ class DebtRepository @Inject constructor(
 
     suspend fun insertDebt(debt: DebtEntity): Long {
         val id = debtDao.insertDebt(debt)
-        firestoreRepository.saveDebt(debt.userId, debt.copy(id = id))
+        try { firestoreRepository.saveDebt(debt.userId, debt.copy(id = id)) }
+        catch (e: Exception) { Log.w(TAG, "saveDebt failed: ${e.message}") }
         return id
     }
 
     suspend fun updateDebt(debt: DebtEntity) {
         debtDao.updateDebt(debt)
-        firestoreRepository.saveDebt(debt.userId, debt)
+        try { firestoreRepository.saveDebt(debt.userId, debt) }
+        catch (e: Exception) { Log.w(TAG, "updateDebt failed: ${e.message}") }
     }
 
     suspend fun deleteDebt(debt: DebtEntity) {
         debtDao.deleteDebt(debt)
-        firestoreRepository.deleteDebt(debt.userId, debt.id)
+        try { firestoreRepository.deleteDebt(debt.userId, debt.id) }
+        catch (e: Exception) { Log.w(TAG, "deleteDebt failed: ${e.message}") }
     }
 
     suspend fun markDebtPaidOff(id: Long) {
         debtDao.markDebtPaidOff(id)
-        debtDao.getDebtById(id)?.let { firestoreRepository.saveDebt(it.userId, it.copy(isPaidOff = true)) }
+        try { debtDao.getDebtById(id)?.let { firestoreRepository.saveDebt(it.userId, it.copy(isPaidOff = true)) } }
+        catch (e: Exception) { Log.w(TAG, "markDebtPaidOff sync failed: ${e.message}") }
     }
 
     /**

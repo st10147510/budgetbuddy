@@ -1,10 +1,13 @@
 package com.budgetbuddy.data.repository
 
+import android.util.Log
 import com.budgetbuddy.data.local.dao.GoalDao
 import com.budgetbuddy.data.local.entities.GoalEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "GoalRepo"
 
 @Singleton
 class GoalRepository @Inject constructor(
@@ -17,17 +20,20 @@ class GoalRepository @Inject constructor(
 
     suspend fun insertGoal(goal: GoalEntity): Long {
         val id = goalDao.insertGoal(goal)
-        firestoreRepository.saveGoal(goal.userId, goal.copy(id = id))
+        try { firestoreRepository.saveGoal(goal.userId, goal.copy(id = id)) }
+        catch (e: Exception) { Log.w(TAG, "saveGoal failed: ${e.message}") }
         return id
     }
 
     suspend fun updateGoal(goal: GoalEntity) {
         goalDao.updateGoal(goal)
-        firestoreRepository.saveGoal(goal.userId, goal)
+        try { firestoreRepository.saveGoal(goal.userId, goal) }
+        catch (e: Exception) { Log.w(TAG, "updateGoal failed: ${e.message}") }
     }
 
     suspend fun deleteGoal(goal: GoalEntity) {
         goalDao.deleteGoal(goal)
-        firestoreRepository.deleteGoal(goal.userId, goal.id)
+        try { firestoreRepository.deleteGoal(goal.userId, goal.id) }
+        catch (e: Exception) { Log.w(TAG, "deleteGoal failed: ${e.message}") }
     }
 }

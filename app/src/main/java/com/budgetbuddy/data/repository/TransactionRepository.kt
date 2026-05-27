@@ -1,10 +1,13 @@
 package com.budgetbuddy.data.repository
 
+import android.util.Log
 import com.budgetbuddy.data.local.dao.TransactionDao
 import com.budgetbuddy.data.local.entities.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "TransactionRepo"
 
 @Singleton
 class TransactionRepository @Inject constructor(
@@ -37,18 +40,21 @@ class TransactionRepository @Inject constructor(
 
     suspend fun insertTransaction(transaction: TransactionEntity): Long {
         val id = transactionDao.insertTransaction(transaction)
-        firestoreRepository.saveTransaction(transaction.userId, transaction.copy(id = id))
+        try { firestoreRepository.saveTransaction(transaction.userId, transaction.copy(id = id)) }
+        catch (e: Exception) { Log.w(TAG, "saveTransaction failed: ${e.message}") }
         return id
     }
 
     suspend fun updateTransaction(transaction: TransactionEntity) {
         transactionDao.updateTransaction(transaction)
-        firestoreRepository.saveTransaction(transaction.userId, transaction)
+        try { firestoreRepository.saveTransaction(transaction.userId, transaction) }
+        catch (e: Exception) { Log.w(TAG, "updateTransaction failed: ${e.message}") }
     }
 
     suspend fun deleteTransaction(transaction: TransactionEntity) {
         transactionDao.deleteTransaction(transaction)
-        firestoreRepository.deleteTransaction(transaction.userId, transaction.id)
+        try { firestoreRepository.deleteTransaction(transaction.userId, transaction.id) }
+        catch (e: Exception) { Log.w(TAG, "deleteTransaction failed: ${e.message}") }
     }
 
     suspend fun deleteTransactionById(id: Long) =

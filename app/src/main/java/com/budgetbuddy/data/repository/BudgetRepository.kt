@@ -1,10 +1,13 @@
 package com.budgetbuddy.data.repository
 
+import android.util.Log
 import com.budgetbuddy.data.local.dao.BudgetDao
 import com.budgetbuddy.data.local.entities.BudgetEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "BudgetRepo"
 
 @Singleton
 class BudgetRepository @Inject constructor(
@@ -19,12 +22,14 @@ class BudgetRepository @Inject constructor(
 
     suspend fun insertOrUpdateBudget(budget: BudgetEntity): Long {
         val id = budgetDao.insertOrUpdateBudget(budget)
-        firestoreRepository.saveBudget(budget.userId, budget.copy(id = id))
+        try { firestoreRepository.saveBudget(budget.userId, budget.copy(id = id)) }
+        catch (e: Exception) { Log.w(TAG, "saveBudget failed: ${e.message}") }
         return id
     }
 
     suspend fun deleteBudget(budget: BudgetEntity) {
         budgetDao.deleteBudget(budget)
-        firestoreRepository.deleteBudget(budget.userId, budget.id)
+        try { firestoreRepository.deleteBudget(budget.userId, budget.id) }
+        catch (e: Exception) { Log.w(TAG, "deleteBudget failed: ${e.message}") }
     }
 }
