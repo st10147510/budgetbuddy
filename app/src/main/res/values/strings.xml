@@ -116,8 +116,13 @@
     <string name="no_goals">No goals yet.\nTap + to add one.</string>
 
     <!-- Profile extras -->
+    <string name="sync_to_cloud">Sync to the Cloud</string>
+    <string name="syncing">Syncing…</string>
+    <string name="sync_success">All data synced to the cloud</string>
     <string name="manage_categories">Manage Categories</string>
     <string name="my_badges">My Badges</string>
+    <string name="change_photo">Change profile photo</string>
+    <string name="uploading_photo">Uploading photo…</string>
     <string name="all_transactions">All Transactions</string>
     <string name="debt_management">Debt Management</string>
     <string name="no_debts">No debts added yet.\nTap + to track one.</string>
