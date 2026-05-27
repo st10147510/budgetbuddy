@@ -117,8 +117,32 @@ class DebtRepositoryTest {
     }
 
     @Test
+    fun `insertDebt syncs to Firestore with DAO-assigned id`() = runTest {
+        val d = debt(0, "Test", 100.0, 5.0, 10.0)
+        whenever(debtDao.insertDebt(d)).thenReturn(1L)
+        repository.insertDebt(d)
+        verify(firestoreRepository).saveDebt("user1", d.copy(id = 1L))
+    }
+
+    @Test
+    fun `deleteDebt removes from Room and Firestore`() = runTest {
+        val d = debt(5L, "Loan", 100.0, 5.0, 10.0)
+        repository.deleteDebt(d)
+        verify(debtDao).deleteDebt(d)
+        verify(firestoreRepository).deleteDebt("user1", 5L)
+    }
+
+    @Test
     fun `markDebtPaidOff delegates to dao`() = runTest {
         repository.markDebtPaidOff(5L)
         verify(debtDao).markDebtPaidOff(5L)
+    }
+
+    @Test
+    fun `markDebtPaidOff syncs isPaidOff=true to Firestore`() = runTest {
+        val paid = debt(5L, "Loan", 0.0, 5.0, 10.0).copy(isPaidOff = true)
+        whenever(debtDao.getDebtById(5L)).thenReturn(paid)
+        repository.markDebtPaidOff(5L)
+        verify(firestoreRepository).saveDebt("user1", paid)
     }
 }

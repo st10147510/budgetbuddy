@@ -43,6 +43,14 @@ class GoalRepositoryTest {
     }
 
     @Test
+    fun `insertGoal syncs to Firestore with DAO-assigned id`() = runTest {
+        val g = goal(0, 5000.0, 0.0)
+        whenever(goalDao.insertGoal(g)).thenReturn(1L)
+        repository.insertGoal(g)
+        verify(firestoreRepository).saveGoal("user1", g.copy(id = 1L))
+    }
+
+    @Test
     fun `updateGoal delegates to dao`() = runTest {
         val g = goal(1, 5000.0, 2500.0)
         repository.updateGoal(g)
@@ -50,10 +58,24 @@ class GoalRepositoryTest {
     }
 
     @Test
+    fun `updateGoal syncs to Firestore`() = runTest {
+        val g = goal(1, 5000.0, 2500.0)
+        repository.updateGoal(g)
+        verify(firestoreRepository).saveGoal("user1", g)
+    }
+
+    @Test
     fun `deleteGoal delegates to dao`() = runTest {
         val g = goal(1, 5000.0, 2500.0)
         repository.deleteGoal(g)
         verify(goalDao).deleteGoal(g)
+    }
+
+    @Test
+    fun `deleteGoal removes from Firestore`() = runTest {
+        val g = goal(1, 5000.0, 2500.0)
+        repository.deleteGoal(g)
+        verify(firestoreRepository).deleteGoal("user1", 1L)
     }
 
     @Test
