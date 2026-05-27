@@ -86,14 +86,23 @@ class AddExpenseFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
+                        is ExpenseUiState.Loading -> {
+                            binding.btnSave.isEnabled = false
+                            binding.btnSave.text = getString(R.string.uploading_photo)
+                        }
                         is ExpenseUiState.Saved, is ExpenseUiState.Deleted -> {
                             findNavController().navigateUp()
                         }
                         is ExpenseUiState.Error -> {
+                            binding.btnSave.isEnabled = true
+                            binding.btnSave.text = getString(R.string.save)
                             Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                             viewModel.resetState()
                         }
-                        else -> Unit
+                        else -> {
+                            binding.btnSave.isEnabled = true
+                            binding.btnSave.text = getString(R.string.save)
+                        }
                     }
                 }
             }
@@ -121,7 +130,7 @@ class AddExpenseFragment : Fragment() {
             categoryId = category.id,
             date = selectedDate,
             notes = notes,
-            receiptPath = receiptUri?.toString(),
+            receiptUri = receiptUri,
             type = if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE
         )
     }

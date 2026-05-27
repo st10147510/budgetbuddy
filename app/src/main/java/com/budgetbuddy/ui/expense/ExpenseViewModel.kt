@@ -1,13 +1,14 @@
 package com.budgetbuddy.ui.expense
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.BadgeRepository
 import com.budgetbuddy.data.repository.CategoryRepository
+import com.budgetbuddy.data.repository.StorageRepository
 import com.budgetbuddy.data.repository.TransactionRepository
-import com.budgetbuddy.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,7 +26,8 @@ sealed class ExpenseUiState {
 class ExpenseViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val categoryRepository: CategoryRepository,
-    private val badgeRepository: BadgeRepository
+    private val badgeRepository: BadgeRepository,
+    private val storageRepository: StorageRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ExpenseUiState>(ExpenseUiState.Idle)
@@ -59,7 +61,7 @@ class ExpenseViewModel @Inject constructor(
         categoryId: Long,
         date: Long,
         notes: String?,
-        receiptPath: String?,
+        receiptUri: Uri?,
         type: TransactionType = TransactionType.EXPENSE,
         existingId: Long = -1
     ) {
@@ -69,6 +71,9 @@ class ExpenseViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = ExpenseUiState.Loading
             try {
+                val receiptUrl = receiptUri?.let { uri ->
+                    storageRepository.uploadReceiptPhoto(userId, uri).getOrNull()
+                }
                 val transaction = TransactionEntity(
                     id = if (existingId > 0) existingId else 0,
                     userId = userId,
@@ -76,7 +81,7 @@ class ExpenseViewModel @Inject constructor(
                     categoryId = categoryId,
                     date = date,
                     notes = notes?.takeIf { it.isNotBlank() },
-                    receiptImagePath = receiptPath,
+                    receiptImagePath = receiptUrl,
                     type = type
                 )
                 if (existingId > 0) transactionRepository.updateTransaction(transaction)
