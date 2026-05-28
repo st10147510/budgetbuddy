@@ -15,7 +15,7 @@ class FirestoreService
 
     public function __construct()
     {
-        $this->http = new Client(['timeout' => 10]);
+        $this->http = new Client(['timeout' => 30]);
         $credsPath = config('firebase.projects.app.credentials');
         $creds = json_decode(file_get_contents(base_path($credsPath)), true);
         $this->projectId = $creds['project_id'];
@@ -56,6 +56,65 @@ class FirestoreService
         } catch (Throwable) {
             return [];
         }
+    }
+
+    /**
+     * Write a document with an auto-generated ID (POST).
+     */
+    public function addDocument(string $userId, string $collection, array $data): string
+    {
+        $url      = "{$this->baseUrl}/users/{$userId}/{$collection}";
+        $response = $this->http->post($url, [
+            'headers' => [
+                'Authorization' => "Bearer {$this->accessToken}",
+                'Content-Type'  => 'application/json',
+            ],
+            'json' => ['fields' => $this->encodeFields($data)],
+        ]);
+
+        $result = json_decode($response->getBody(), true);
+        return $result['name'] ?? '';
+    }
+
+    /**
+     * Write (upsert) a document with a specific ID (PATCH).
+     * Matches Android's txCol(userId).document(id.toString()).set(...) pattern.
+     */
+    public function setDocument(string $userId, string $collection, string $docId, array $data): void
+    {
+        $url = "{$this->baseUrl}/users/{$userId}/{$collection}/{$docId}";
+        $this->http->patch($url, [
+            'headers' => [
+                'Authorization' => "Bearer {$this->accessToken}",
+                'Content-Type'  => 'application/json',
+            ],
+            'json' => ['fields' => $this->encodeFields($data)],
+        ]);
+    }
+
+    private function encodeFields(array $data): array
+    {
+        $fields = [];
+        foreach ($data as $key => $value) {
+            $fields[$key] = $this->encodeValue($value);
+        }
+        return $fields;
+    }
+
+    private function encodeValue(mixed $value): array
+    {
+        return match (true) {
+            is_null($value)   => ['nullValue' => null],
+            is_bool($value)   => ['booleanValue' => $value],
+            is_int($value)    => ['integerValue' => (string) $value],
+            is_float($value)  => ['doubleValue' => $value],
+            is_string($value) => ['stringValue' => $value],
+            is_array($value) && array_is_list($value) => [
+                'arrayValue' => ['values' => array_map([$this, 'encodeValue'], $value)]
+            ],
+            is_array($value) => ['mapValue' => ['fields' => $this->encodeFields($value)]],
+            default => ['stringValue' => (string) $value],
+        };
     }
 
     private function parseDocuments(array $documents): array

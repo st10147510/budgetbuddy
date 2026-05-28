@@ -6,52 +6,70 @@
 @section('content')
 
 @if(!$firebaseConfigured)
-<div class="alert alert-warning d-flex align-items-start gap-3 mb-4">
-    <i class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
+<div class="flex items-start gap-3 p-4 mb-6 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+    <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+    </svg>
     <div>
-        <strong>Firebase not configured.</strong>
-        Place your service account JSON at <code>web/firebase-service-account.json</code>
-        and set <code>FIREBASE_CREDENTIALS=firebase-service-account.json</code> in <code>web/.env</code>.
-        Get it from the <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a>
-        → Project Settings → Service Accounts → Generate new private key.
+        <strong class="font-semibold">Firebase not configured.</strong>
+        Place your service account JSON at <code class="bg-amber-100 px-1 rounded text-xs">web/firebase-service-account.json</code>
+        and set <code class="bg-amber-100 px-1 rounded text-xs">FIREBASE_CREDENTIALS=firebase-service-account.json</code> in
+        <code class="bg-amber-100 px-1 rounded text-xs">web/.env</code>.
     </div>
 </div>
 @endif
 
-<div class="row g-4 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card p-3">
-            <div class="text-muted small mb-1">Total Users</div>
-            <div class="fs-3 fw-bold">{{ number_format($stats['total_users']) }}</div>
+{{-- Stat cards --}}
+<div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                <i class="bi bi-people text-slate-600"></i>
+            </div>
+            <span class="text-sm text-slate-500 font-medium">Total Users</span>
         </div>
+        <div class="text-3xl font-bold text-slate-900">{{ number_format($stats['total_users']) }}</div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card p-3">
-            <div class="text-muted small mb-1">Active Users</div>
-            <div class="fs-3 fw-bold text-success">{{ number_format($stats['active_users']) }}</div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <i class="bi bi-person-check text-emerald-600"></i>
+            </div>
+            <span class="text-sm text-slate-500 font-medium">Active</span>
         </div>
+        <div class="text-3xl font-bold text-emerald-600">{{ number_format($stats['active_users']) }}</div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card p-3">
-            <div class="text-muted small mb-1">Disabled Users</div>
-            <div class="fs-3 fw-bold text-danger">{{ number_format($stats['disabled_users']) }}</div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                <i class="bi bi-person-dash text-red-500"></i>
+            </div>
+            <span class="text-sm text-slate-500 font-medium">Disabled</span>
         </div>
+        <div class="text-3xl font-bold text-red-500">{{ number_format($stats['disabled_users']) }}</div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card p-3">
-            <div class="text-muted small mb-1">New This Week</div>
-            <div class="fs-3 fw-bold text-primary">{{ number_format($stats['new_this_week']) }}</div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                <i class="bi bi-person-plus text-blue-600"></i>
+            </div>
+            <span class="text-sm text-slate-500 font-medium">New This Week</span>
         </div>
+        <div class="text-3xl font-bold text-blue-600">{{ number_format($stats['new_this_week']) }}</div>
     </div>
 </div>
 
-<div class="card border-0 rounded-3 shadow-sm p-3">
-    <div class="d-flex justify-content-between align-items-center">
-        <span class="fw-semibold">Quick Actions</span>
+{{-- Quick actions --}}
+<div class="bg-white rounded-2xl border border-slate-200 p-6">
+    <h2 class="text-sm font-semibold text-slate-900 mb-4">Quick actions</h2>
+    <div class="flex flex-wrap gap-3">
+        <a href="{{ route('admin.users.index') }}"
+           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium
+                  rounded-lg transition-colors duration-150">
+            <i class="bi bi-people"></i>
+            Manage Users
+        </a>
     </div>
-    <hr>
-    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">
-        <i class="bi bi-people me-1"></i> Manage Users
-    </a>
 </div>
+
 @endsection

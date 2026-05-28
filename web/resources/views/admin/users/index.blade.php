@@ -6,81 +6,122 @@
 @section('content')
 
 @if(!$firebaseConfigured)
-<div class="alert alert-warning d-flex align-items-start gap-3 mb-4">
-    <i class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
-    <div>
-        <strong>Firebase not configured.</strong>
-        Place your service account JSON at <code>web/firebase-service-account.json</code>
-        and set <code>FIREBASE_CREDENTIALS=firebase-service-account.json</code> in <code>web/.env</code>.
+<div class="flex items-start gap-3 p-4 mb-6 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+    <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+    </svg>
+    <div><strong class="font-semibold">Firebase not configured.</strong> Place your service account JSON at
+        <code class="bg-amber-100 px-1 rounded text-xs">web/firebase-service-account.json</code> and set
+        <code class="bg-amber-100 px-1 rounded text-xs">FIREBASE_CREDENTIALS</code> in <code class="bg-amber-100 px-1 rounded text-xs">web/.env</code>.
     </div>
 </div>
 @endif
 
-<div class="card border-0 rounded-3 shadow-sm">
-    <div class="card-header bg-white border-0 pt-3 pb-0 px-3 d-flex justify-content-between align-items-center">
-        <span class="fw-semibold">All Users <span class="text-muted fw-normal">({{ $total }})</span></span>
-        <form method="GET" action="{{ route('admin.users.index') }}" class="d-flex gap-2">
-            <input type="text" name="search" class="form-control form-control-sm" placeholder="Search email or name…"
-                value="{{ $search }}" style="width:240px;">
-            <button class="btn btn-sm btn-primary">Search</button>
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-b border-slate-100">
+        <div>
+            <h2 class="text-sm font-semibold text-slate-900">All users</h2>
+            <p class="text-xs text-slate-500 mt-0.5">{{ number_format($total) }} total accounts</p>
+        </div>
+        <form method="GET" action="{{ route('admin.users.index') }}" class="flex items-center gap-2">
+            <div class="relative">
+                <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" name="search" value="{{ $search }}"
+                    placeholder="Search email or name…"
+                    class="pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-900
+                           placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-56">
+            </div>
+            <button type="submit"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                Search
+            </button>
             @if($search)
-                <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">Clear</a>
+                <a href="{{ route('admin.users.index') }}"
+                   class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg border border-slate-300
+                          hover:border-slate-400 transition-colors">
+                    Clear
+                </a>
             @endif
         </form>
     </div>
-    <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th class="ps-3">Email</th>
-                    <th>Display Name</th>
-                    <th>Status</th>
-                    <th>Signed Up</th>
-                    <th>Last Sign-in</th>
-                    <th></th>
+
+    {{-- Table --}}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-slate-50 text-left">
+                    <th class="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">User</th>
+                    <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                    <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Signed up</th>
+                    <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Last sign-in</th>
+                    <th class="px-6 py-3"></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-100">
                 @forelse($users as $user)
-                    <tr>
-                        <td class="ps-3">{{ $user['email'] ?? '—' }}</td>
-                        <td>{{ $user['display_name'] ?? '—' }}</td>
-                        <td>
-                            @if($user['disabled'])
-                                <span class="badge badge-disabled">Disabled</span>
-                            @else
-                                <span class="badge badge-active">Active</span>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="px-6 py-3.5">
+                            <div class="font-medium text-slate-900">{{ $user['email'] ?? '—' }}</div>
+                            @if($user['display_name'])
+                                <div class="text-xs text-slate-500 mt-0.5">{{ $user['display_name'] }}</div>
                             @endif
                         </td>
-                        <td class="text-muted small">{{ $user['created_at'] ?? '—' }}</td>
-                        <td class="text-muted small">{{ $user['last_sign_in'] ?? 'Never' }}</td>
-                        <td class="text-end pe-3">
-                            <a href="{{ route('admin.users.show', $user['uid']) }}" class="btn btn-sm btn-outline-secondary">
+                        <td class="px-4 py-3.5">
+                            @if($user['disabled'])
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Disabled
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Active
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3.5 text-slate-500 text-xs">{{ $user['created_at'] ?? '—' }}</td>
+                        <td class="px-4 py-3.5 text-slate-500 text-xs">{{ $user['last_sign_in'] ?? 'Never' }}</td>
+                        <td class="px-6 py-3.5 text-right">
+                            <a href="{{ route('admin.users.show', $user['uid']) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600
+                                      border border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-900 transition-colors">
                                 View
+                                <i class="bi bi-arrow-right text-xs"></i>
                             </a>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="text-center text-muted py-4">No users found.</td></tr>
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                            <i class="bi bi-people text-3xl mb-3 block"></i>
+                            No users found.
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
+    {{-- Pagination --}}
     @if($lastPage > 1)
-        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center py-2 px-3">
-            <span class="text-muted small">Page {{ $page }} of {{ $lastPage }}</span>
-            <div class="d-flex gap-2">
+        <div class="flex items-center justify-between px-6 py-3.5 border-t border-slate-100 bg-slate-50/50">
+            <span class="text-xs text-slate-500">Page {{ $page }} of {{ $lastPage }}</span>
+            <div class="flex gap-2">
                 @if($page > 1)
                     <a href="{{ route('admin.users.index', ['page' => $page - 1, 'search' => $search]) }}"
-                        class="btn btn-sm btn-outline-secondary">← Prev</a>
+                       class="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:border-slate-400 transition-colors">
+                        ← Prev
+                    </a>
                 @endif
                 @if($page < $lastPage)
                     <a href="{{ route('admin.users.index', ['page' => $page + 1, 'search' => $search]) }}"
-                        class="btn btn-sm btn-outline-secondary">Next →</a>
+                       class="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:border-slate-400 transition-colors">
+                        Next →
+                    </a>
                 @endif
             </div>
         </div>
     @endif
 </div>
+
 @endsection

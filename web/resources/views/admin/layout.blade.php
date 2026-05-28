@@ -1,100 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'BudgetBuddy Admin')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root { --sidebar-width: 240px; }
-        body { background: #f4f6f9; }
-        .sidebar {
-            width: var(--sidebar-width);
-            min-height: 100vh;
-            background: #1e2a3b;
-            position: fixed;
-            top: 0; left: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-brand {
-            padding: 1.25rem 1.5rem;
-            color: #fff;
-            font-weight: 700;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(255,255,255,.1);
-        }
-        .sidebar-brand span { color: #4db8ff; }
-        .sidebar-nav { padding: .5rem 0; flex: 1; }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            padding: .65rem 1.5rem;
-            color: rgba(255,255,255,.65);
-            text-decoration: none;
-            font-size: .9rem;
-        }
-        .sidebar-nav a:hover, .sidebar-nav a.active { color: #fff; background: rgba(255,255,255,.08); }
-        .main-content { margin-left: var(--sidebar-width); padding: 2rem; }
-        .topbar {
-            background: #fff;
-            border-radius: .5rem;
-            padding: .75rem 1.25rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 1px 4px rgba(0,0,0,.06);
-        }
-        .stat-card { border: none; border-radius: .75rem; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
-        .badge-active { background: #d1fadf; color: #065f46; }
-        .badge-disabled { background: #fee2e2; color: #991b1b; }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="h-full font-sans antialiased">
 
-<div class="sidebar">
-    <div class="sidebar-brand">Budget<span>Buddy</span> <small class="fw-normal text-white-50">Admin</small></div>
-    <nav class="sidebar-nav">
-        <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-            <i class="bi bi-speedometer2"></i> Dashboard
-        </a>
-        <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-            <i class="bi bi-people"></i> Users
-        </a>
-    </nav>
-    <div style="padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.1);">
-        <form method="POST" action="{{ route('admin.logout') }}">
-            @csrf
-            <button class="btn btn-sm btn-outline-light w-100"><i class="bi bi-box-arrow-left me-1"></i>Logout</button>
-        </form>
+<div class="flex h-full min-h-screen">
+
+    {{-- ── Sidebar ── --}}
+    <aside class="w-60 flex-shrink-0 bg-slate-900 flex flex-col fixed inset-y-0 left-0 z-40">
+
+        {{-- Logo --}}
+        <div class="flex items-center gap-2 px-5 py-5 border-b border-white/[0.06]">
+            <div class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center">
+                <i class="bi bi-piggy-bank text-white text-sm"></i>
+            </div>
+            <span class="font-semibold text-white tracking-tight">
+                Budget<span class="text-blue-400">Buddy</span>
+            </span>
+            <span class="ml-auto text-[10px] font-medium text-slate-500 uppercase tracking-wider">Admin</span>
+        </div>
+
+        {{-- Nav --}}
+        <nav class="flex-1 py-4 space-y-0.5 px-3">
+            <a href="{{ route('admin.dashboard') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                      {{ request()->routeIs('admin.dashboard') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
+                <i class="bi bi-speedometer2 text-base"></i>
+                Dashboard
+            </a>
+            <a href="{{ route('admin.users.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                      {{ request()->routeIs('admin.users.*') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
+                <i class="bi bi-people text-base"></i>
+                Users
+            </a>
+        </nav>
+
+        {{-- Logout --}}
+        <div class="px-3 pb-5 pt-3 border-t border-white/[0.06]">
+            <form method="POST" action="{{ route('admin.logout') }}">
+                @csrf
+                <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400
+                               hover:text-white hover:bg-white/[0.06] transition-all duration-150">
+                    <i class="bi bi-box-arrow-left text-base"></i>
+                    Sign out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    {{-- ── Main content ── --}}
+    <div class="flex-1 flex flex-col ml-60">
+
+        {{-- Topbar --}}
+        <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between">
+            <h1 class="text-slate-900 font-semibold text-lg">@yield('page-title', 'Dashboard')</h1>
+            <div class="flex items-center gap-2 text-slate-500 text-sm">
+                <i class="bi bi-shield-lock"></i>
+                <span>Admin Panel</span>
+            </div>
+        </header>
+
+        {{-- Alerts --}}
+        <div class="px-8 pt-4">
+            @if(session('success'))
+                <div class="flex items-start gap-3 p-4 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
+                    <i class="bi bi-check-circle-fill text-emerald-500 mt-0.5"></i>
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="flex items-start gap-3 p-4 mb-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+                    <i class="bi bi-exclamation-circle-fill text-red-500 mt-0.5"></i>
+                    {{ session('error') }}
+                </div>
+            @endif
+        </div>
+
+        {{-- Page content --}}
+        <main class="flex-1 px-8 pb-8 pt-4">
+            @yield('content')
+        </main>
     </div>
+
 </div>
 
-<div class="main-content">
-    <div class="topbar">
-        <h5 class="mb-0 fw-semibold">@yield('page-title', 'Dashboard')</h5>
-        <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Admin Panel</span>
-    </div>
-
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-1"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle me-1"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @yield('content')
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
