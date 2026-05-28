@@ -67,18 +67,18 @@ class DebtRepository @Inject constructor(
         val balances = sorted.map { it.balance }.toMutableList()
         val schedule = mutableListOf<DebtPayoffMonth>()
         var month = 1
-        val totalMinimum = sorted.sumOf { it.minimumPayment }
 
         while (balances.any { it > 0 } && month <= 360) {
-            var extra = extraPayment
+            // Freed minimums from fully-paid debts roll over to the current target (the snowball/avalanche cascade)
+            val freedMinimums = sorted.indices.filter { balances[it] <= 0 }.sumOf { sorted[it].minimumPayment }
+            val targetIndex = balances.indexOfFirst { it > 0 }
+            val targetBonus = extraPayment + freedMinimums
+
             sorted.forEachIndexed { index, debt ->
                 if (balances[index] <= 0) return@forEachIndexed
                 val monthlyRate = debt.interestRate / 100.0 / 12.0
                 val interest = balances[index] * monthlyRate
-                var payment = debt.minimumPayment
-                if (index == sorted.indexOfFirst { balances[sorted.indexOf(it)] > 0 }) {
-                    payment += extra
-                }
+                val payment = if (index == targetIndex) debt.minimumPayment + targetBonus else debt.minimumPayment
                 val actualPayment = minOf(payment, balances[index] + interest)
                 balances[index] = maxOf(0.0, balances[index] + interest - actualPayment)
                 schedule.add(DebtPayoffMonth(month, debt.name, actualPayment, balances[index]))

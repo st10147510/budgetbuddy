@@ -80,6 +80,36 @@ class DebtRepositoryTest {
     }
 
     @Test
+    fun `freed minimums roll over to next target debt`() {
+        // Small debt (R200) pays off in month 1; its R50 minimum should cascade to Large in month 2
+        val debts = listOf(
+            debt(1, "Small", 200.0, 0.0, 50.0),
+            debt(2, "Large", 2400.0, 12.0, 100.0)
+        )
+        val schedule = repository.computePayoffSchedule(debts, PayoffStrategy.SNOWBALL)
+        // After Small is paid off, Large should receive 100 + 50 (freed) = 150/month
+        val largeAfterPayoff = schedule.filter { it.debtName == "Large" && it.month >= 2 }
+        assertTrue("Large debt should get boosted payment after Small pays off",
+            largeAfterPayoff.any { it.payment >= 149.0 })
+    }
+
+    @Test
+    fun `avalanche pays less total interest than snowball when high-rate debt has large balance`() {
+        // SmallLow → snowball targets first; LargeHigh → avalanche targets first.
+        // Avalanche attacks high-rate debt sooner → less compound interest overall.
+        val debts = listOf(
+            debt(1, "SmallLow",  500.0,  5.0, 100.0),
+            debt(2, "LargeHigh", 5000.0, 25.0, 200.0)
+        )
+        val snowball = repository.computePayoffSchedule(debts, PayoffStrategy.SNOWBALL, extraPayment = 100.0)
+        val avalanche = repository.computePayoffSchedule(debts, PayoffStrategy.AVALANCHE, extraPayment = 100.0)
+        val principal = debts.sumOf { it.balance }
+        val snowballInterest = snowball.sumOf { it.payment } - principal
+        val avalancheInterest = avalanche.sumOf { it.payment } - principal
+        assertTrue("Avalanche should pay less total interest than snowball", avalancheInterest < snowballInterest)
+    }
+
+    @Test
     fun `schedule does not exceed 360 months`() {
         val debts = listOf(
             debt(1, "Huge", 1_000_000.0, 99.0, 1.0) // nearly impossible to pay off

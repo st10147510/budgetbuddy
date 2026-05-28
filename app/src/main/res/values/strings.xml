@@ -82,6 +82,19 @@
     <string name="snowball">Snowball</string>
     <string name="avalanche">Avalanche</string>
     <string name="payoff_strategy">Payoff Strategy</string>
+    <string name="view_payment_plan">View Payment Plan</string>
+    <string name="payment_plan">Payment Plan</string>
+    <string name="extra_monthly_payment">Extra monthly payment (optional)</string>
+    <string name="calculate_plan">Calculate Plan</string>
+    <string name="select_plan">Select</string>
+    <string name="plan_months">%1$d months</string>
+    <string name="plan_interest">Interest: R %1$.2f</string>
+    <string name="plan_total">Total: R %1$.2f</string>
+    <string name="schedule_title">Month-by-month plan</string>
+    <string name="month_header">Month %1$d</string>
+    <string name="schedule_balance">Bal: R %1$.2f</string>
+    <string name="no_active_debts_plan">Add debts to see your payoff plan.</string>
+    <string name="plan_calculating">Calculating…</string>
 
     <!-- Profile -->
     <string name="profile">Profile</string>
@@ -123,6 +136,7 @@
     <string name="my_badges">My Badges</string>
     <string name="change_photo">Change profile photo</string>
     <string name="uploading_photo">Uploading photo…</string>
+    <string name="camera_permission_denied">Camera permission is required to take a photo</string>
     <string name="all_transactions">All Transactions</string>
     <string name="debt_management">Debt Management</string>
     <string name="no_debts">No debts added yet.\nTap + to track one.</string>

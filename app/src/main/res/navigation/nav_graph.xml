@@ -116,7 +116,18 @@
         android:id="@+id/debtFragment"
         android:name="com.budgetbuddy.ui.debt.DebtFragment"
         android:label="Debt"
-        tools:layout="@layout/fragment_debt" />
+        tools:layout="@layout/fragment_debt">
+        <action android:id="@+id/action_debt_to_paymentPlan"
+            app:destination="@id/paymentPlanFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/paymentPlanFragment"
+        android:name="com.budgetbuddy.ui.debt.PaymentPlanFragment"
+        android:label="Payment Plan"
+        tools:layout="@layout/fragment_payment_plan"/>
 
     <fragment
         android:id="@+id/profileFragment"

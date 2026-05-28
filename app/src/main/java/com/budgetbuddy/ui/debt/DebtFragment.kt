@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.budgetbuddy.R
 import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.data.local.entities.DebtEntity
-import com.budgetbuddy.data.local.entities.PayoffStrategy
 import com.budgetbuddy.databinding.DialogAddDebtBinding
 import com.budgetbuddy.databinding.DialogMakePaymentBinding
 import com.budgetbuddy.databinding.FragmentDebtBinding
@@ -54,8 +53,8 @@ class DebtFragment : Fragment() {
 
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
         binding.fabAddDebt.setOnClickListener { showAddDebtDialog(userId) }
-        binding.rgStrategy.setOnCheckedChangeListener { _, id ->
-            viewModel.setStrategy(if (id == R.id.rbSnowball) PayoffStrategy.SNOWBALL else PayoffStrategy.AVALANCHE)
+        binding.btnViewPlan.setOnClickListener {
+            findNavController().navigate(R.id.action_debt_to_paymentPlan)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

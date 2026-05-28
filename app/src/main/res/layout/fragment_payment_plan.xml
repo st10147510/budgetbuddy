@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_back"
+                android:background="@drawable/bg_icon_circle_dark"
+                android:contentDescription="@string/back"
+                android:padding="10dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/payment_plan"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary_dark"
+                android:gravity="center"/>
+
+            <View android:layout_width="44dp" android:layout_height="44dp"/>
+        </LinearLayout>
+
+        <!-- Empty state -->
+        <TextView
+            android:id="@+id/tvEmptyDebts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_active_debts_plan"
+            android:textColor="@color/text_secondary_dark"
+            android:gravity="center"
+            android:padding="40dp"
+            android:visibility="gone"/>
+
+        <!-- Extra payment input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilExtraPayment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="@string/extra_monthly_payment"
+            app:prefixText="R "
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="@color/teal_accent"
+            app:hintTextColor="@color/text_secondary_dark">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etExtraPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:imeOptions="actionDone"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Calculate button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCalculate"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/calculate_plan"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/background"
+            app:backgroundTint="@color/cream_accent"
+            app:cornerRadius="26dp"/>
+
+        <!-- Strategy comparison cards -->
+        <LinearLayout
+            android:id="@+id/llStrategyCards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <!-- Snowball card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSnowball"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                app:cardBackgroundColor="@color/background_light"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/teal_accent"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/snowball"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/teal_accent"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvSnowballMonths"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="— months"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary_dark"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/tvSnowballInterest"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Interest: —"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_dark"
+                        android:layout_marginBottom="2dp"/>
+
+                    <TextView
+                        android:id="@+id/tvSnowballTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total: —"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_dark"
+                        android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSelectSnowball"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/select_plan"
+                        android:textSize="13sp"
+                        android:textColor="@color/background"
+                        app:backgroundTint="@color/teal_accent"
+                        app:cornerRadius="18dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Avalanche card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAvalanche"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                app:cardBackgroundColor="@color/background_light"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/teal_accent"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/avalanche"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/teal_accent"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvAvalancheMonths"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="— months"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary_dark"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/tvAvalancheInterest"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Interest: —"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_dark"
+                        android:layout_marginBottom="2dp"/>
+
+                    <TextView
+                        android:id="@+id/tvAvalancheTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total: —"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_dark"
+                        android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSelectAvalanche"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/select_plan"
+                        android:textSize="13sp"
+                        android:textColor="@color/background"
+                        app:backgroundTint="@color/teal_accent"
+                        app:cornerRadius="18dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Schedule section -->
+        <TextView
+            android:id="@+id/tvScheduleTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/schedule_title"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary_dark"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSchedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
