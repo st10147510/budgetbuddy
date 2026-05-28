@@ -22,15 +22,18 @@ To build it yourself:
 
 ## Features
 
-- **Expense Tracking** — Log income and expenses with categories, notes, and dates
+- **Expense Tracking** — Log income and expenses with categories, notes, dates, and optional receipt photos (uploaded to Firebase Storage)
 - **Budgets** — Set per-category spending limits and minimum spending goals; real-time compliance status (On Track / Near Limit / Over Limit / Below Goal)
-- **Savings Goals** — Track progress toward financial goals
+- **Savings Goals** — Track progress toward financial goals; add savings contributions at any time
 - **Debt Management** — Monitor debts with payoff schedules and strategy selection (Snowball / Avalanche)
+- **Payment Plans** — Generate a month-by-month payoff schedule across all debts using the selected strategy
 - **Reports** — Monthly line chart of net balance, grouped bar chart of budget vs actual spend per category, and a full transaction list — all filterable by month
+- **Detail & Edit screens** — View full details and edit records for transactions, budgets, debts, and goals
 - **Gamification** — Earn badges for milestones (first transaction, 7-day streak)
 - **Notifications** — Budget alert workers and daily reminders via WorkManager
 - **Offline-first** — Room database with write-through sync to Firestore on every save/update/delete
 - **Cloud Auth** — Firebase Authentication (email/password) with friendly error messages and password reset
+- **Localization** — 11 languages: English, Sesotho, Swahili, Zulu, Afrikaans, Arabic, German, Spanish, French, Italian, Dutch, Portuguese
 
 ## Tech Stack
 
@@ -42,6 +45,7 @@ To build it yourself:
 | Local DB | Room 2.6.1 (`budget_buddy.db`) |
 | Auth | Firebase Authentication (email/password) |
 | Cloud DB | Firebase Firestore (write-through sync) |
+| Storage | Firebase Storage (receipt photos) |
 | Charts | MPAndroidChart 3.1.0 |
 | Background | WorkManager 2.9.1 |
 | Preferences | DataStore 1.1.1 |
@@ -58,26 +62,31 @@ app/src/main/java/com/budgetbuddy/
 │   │   ├── dao/                     # TransactionDao, BudgetDao, GoalDao, DebtDao, BadgeDao, ...
 │   │   ├── entities/                # Room entities (Transaction, Budget, Goal, Debt, Badge, ...)
 │   │   └── SessionManager.kt
-│   └── repository/                  # AuthRepository, TransactionRepository, BudgetRepository, ...
+│   └── repository/                  # AuthRepository, TransactionRepository, BudgetRepository,
+│                                    # GoalRepository, DebtRepository, StorageRepository, ...
 ├── di/
-│   ├── AppModule.kt                 # FirebaseAuth, DataStore
+│   ├── AppModule.kt                 # FirebaseAuth, FirebaseStorage, DataStore
 │   └── DatabaseModule.kt            # Room DB + all DAOs
 ├── ui/
 │   ├── MainActivity.kt
 │   ├── auth/                        # WelcomeFragment, SignInFragment, SignUpFragment, ForgotPasswordFragment
 │   ├── home/                        # HomeFragment, HomeViewModel
-│   ├── expense/                     # AddExpenseFragment, TransactionListFragment, ExpenseViewModel
-│   ├── budget/                      # BudgetFragment, BudgetViewModel
-│   ├── goals/                       # GoalsFragment, GoalsViewModel
-│   ├── debt/                        # DebtFragment, DebtViewModel
+│   ├── expense/                     # AddExpenseFragment, TransactionDetailFragment,
+│   │                                # TransactionListFragment, ExpenseViewModel
+│   ├── budget/                      # BudgetFragment, BudgetDetailFragment, BudgetViewModel, BudgetDetailViewModel
+│   ├── goals/                       # GoalsFragment, GoalDetailFragment, GoalsViewModel, GoalDetailViewModel
+│   ├── debt/                        # DebtFragment, DebtDetailFragment, PaymentPlanFragment,
+│   │                                # DebtViewModel, DebtDetailViewModel, PaymentPlanViewModel
 │   ├── reports/                     # ReportsFragment, ReportsViewModel
 │   ├── category/                    # CategoriesFragment, CategoryViewModel
 │   ├── gamification/                # BadgesFragment, BadgesViewModel
-│   ├── profile/                     # ProfileFragment
+│   ├── profile/                     # ProfileFragment, ProfileViewModel
 │   └── notifications/               # BudgetAlertWorker, DailyReminderWorker
 └── util/
     ├── Converters.kt                # Room type converters for enums
+    ├── CurrencyFormatter.kt
     ├── DateUtils.kt
+    ├── LocaleHelper.kt
     └── PasswordUtils.kt
 ```
 
@@ -85,6 +94,7 @@ app/src/main/java/com/budgetbuddy/
 
 ```text
 Fragment → ViewModel (StateFlow) → Repository → Room DAO (Flow)
+                                             → Firebase Auth / Firestore / Storage
 ```
 
 - Fragments observe `StateFlow` with `repeatOnLifecycle(STARTED)`
@@ -149,13 +159,66 @@ The chart is reactive: it updates whenever transactions or budgets change, and c
 
 ---
 
+### 3. Debt Payment Plans (Snowball / Avalanche)
+
+The Debt screen lets users choose a payoff strategy and generate a full month-by-month schedule across all active debts.
+
+| Strategy | Description |
+|---|---|
+| Snowball | Pay minimums on all debts; put extra toward the smallest balance first |
+| Avalanche | Pay minimums on all debts; put extra toward the highest interest rate first |
+
+**Key files:**
+
+- `DebtRepository.kt` — `computePayoffSchedule()` builds the schedule
+- `PaymentPlanFragment.kt` + `PaymentPlanViewModel.kt` — strategy selector and schedule list
+- `ScheduleAdapter.kt` — RecyclerView adapter for the month-by-month rows
+
+---
+
+### 4. Receipt Photo Upload
+
+When adding or editing a transaction, users can attach a receipt photo by taking a new picture or choosing one from the gallery. Photos are uploaded to Firebase Storage and the download URL is stored with the transaction.
+
+**Key files:**
+
+- `StorageRepository.kt` — `uploadReceiptPhoto()` uploads to `receipts/{userId}/{timestamp}.jpg`
+- `AppModule.kt` — provides `FirebaseStorage` singleton via Hilt
+- `AddExpenseFragment.kt` — camera / gallery picker; shows preview before saving
+- `TransactionDetailFragment.kt` — loads the receipt image with Glide
+
+---
+
+### 5. Localization (11 Languages)
+
+The app ships with full string translations for:
+
+| Code | Language |
+|---|---|
+| `en` | English (default) |
+| `st` | Sesotho |
+| `sw` | Swahili |
+| `zu` | Zulu |
+| `af` | Afrikaans |
+| `ar` | Arabic |
+| `de` | German |
+| `es` | Spanish |
+| `fr` | French |
+| `it` | Italian |
+| `nl` | Dutch |
+| `pt` | Portuguese |
+
+The device locale is applied automatically by Android. `LocaleHelper.kt` handles in-app language switching from the Profile screen.
+
+---
+
 ## Getting Started
 
 ### Prerequisites
 
 - Android Studio Hedgehog or later
 - JDK 17
-- A Firebase project with Email/Password authentication enabled
+- A Firebase project with Email/Password authentication enabled and Firestore + Storage rules configured
 - `google-services.json` placed in `app/`
 
 ### Build & Run
