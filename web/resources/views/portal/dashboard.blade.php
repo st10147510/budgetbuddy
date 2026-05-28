@@ -31,9 +31,6 @@
         </div>
     </div>
 
-    {{-- Divider --}}
-    <div class="border-t border-white/20 mb-4"></div>
-
     {{-- All-time --}}
     <p class="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-2">All time</p>
     <div class="grid grid-cols-3 gap-3">
