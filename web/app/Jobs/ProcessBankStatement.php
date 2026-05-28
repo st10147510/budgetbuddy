@@ -57,8 +57,12 @@ class ProcessBankStatement implements ShouldQueue
             $imported = 0;
             $now      = (int) (microtime(true) * 1000);
 
-            foreach ($transactions as $i => $tx) {
-                $firestoreId = $now + $i;
+            foreach ($transactions as $tx) {
+                // Deterministic ID: hash of (uid, date, amount, notes) so that
+                // re-uploading the same statement is idempotent (PATCH overwrites
+                // the same document rather than creating a duplicate).
+                $hashInput   = "{$this->uid}|{$tx['date']}|{$tx['amount']}|{$tx['notes']}";
+                $firestoreId = abs(crc32($hashInput));
 
                 // Exact field names from Android FirestoreRepository.TransactionEntity.toMap()
                 $document = [
@@ -70,7 +74,7 @@ class ProcessBankStatement implements ShouldQueue
                     'notes'            => $tx['notes'],
                     'receiptImagePath' => '',
                     'type'             => $tx['type'],
-                    'createdAt'        => $now + $i,
+                    'createdAt'        => $now,
                 ];
 
                 try {

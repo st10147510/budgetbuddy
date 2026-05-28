@@ -12,18 +12,44 @@
     </h1>
     <p class="text-blue-200 text-sm">Here's a snapshot of your finances</p>
 
-    <div class="grid grid-cols-3 gap-4 mt-6">
+    {{-- This month --}}
+    <p class="text-blue-300 text-xs font-semibold uppercase tracking-widest mt-6 mb-2">{{ $monthLabel }}</p>
+    <div class="grid grid-cols-3 gap-3 mb-5">
         <div class="bg-white/10 rounded-xl p-4">
             <div class="text-blue-200 text-xs mb-1">Income</div>
-            <div class="text-2xl font-bold">R{{ number_format($totalIncome, 2) }}</div>
+            <div class="text-xl font-bold">R{{ number_format($monthlyIncome, 2) }}</div>
         </div>
         <div class="bg-white/10 rounded-xl p-4">
             <div class="text-blue-200 text-xs mb-1">Expenses</div>
-            <div class="text-2xl font-bold">R{{ number_format($totalExpense, 2) }}</div>
+            <div class="text-xl font-bold">R{{ number_format($monthlyExpense, 2) }}</div>
         </div>
         <div class="bg-white/10 rounded-xl p-4">
-            <div class="text-blue-200 text-xs mb-1">Net Balance</div>
-            <div class="text-2xl font-bold">R{{ number_format($netBalance, 2) }}</div>
+            <div class="text-blue-200 text-xs mb-1">Net</div>
+            <div class="text-xl font-bold {{ $monthlyNet >= 0 ? 'text-emerald-300' : 'text-red-300' }}">
+                R{{ number_format($monthlyNet, 2) }}
+            </div>
+        </div>
+    </div>
+
+    {{-- Divider --}}
+    <div class="border-t border-white/20 mb-4"></div>
+
+    {{-- All-time --}}
+    <p class="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-2">All time</p>
+    <div class="grid grid-cols-3 gap-3">
+        <div class="bg-white/10 rounded-xl p-4">
+            <div class="text-blue-200 text-xs mb-1">Income</div>
+            <div class="text-xl font-bold">R{{ number_format($totalIncome, 2) }}</div>
+        </div>
+        <div class="bg-white/10 rounded-xl p-4">
+            <div class="text-blue-200 text-xs mb-1">Expenses</div>
+            <div class="text-xl font-bold">R{{ number_format($totalExpense, 2) }}</div>
+        </div>
+        <div class="bg-white/10 rounded-xl p-4">
+            <div class="text-blue-200 text-xs mb-1">Net</div>
+            <div class="text-xl font-bold {{ $netBalance >= 0 ? 'text-emerald-300' : 'text-red-300' }}">
+                R{{ number_format($netBalance, 2) }}
+            </div>
         </div>
     </div>
 </div>

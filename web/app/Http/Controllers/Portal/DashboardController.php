@@ -39,9 +39,19 @@ class DashboardController extends Controller
             $categories   = collect(self::DEFAULT_CATEGORIES);
         }
 
+        // All-time totals
         $totalIncome  = $transactions->where('type', 'INCOME')->sum('amount');
         $totalExpense = $transactions->where('type', 'EXPENSE')->sum('amount');
         $netBalance   = $totalIncome - $totalExpense;
+
+        // Current-month totals (millisecond timestamps match Android DateUtils)
+        $monthStart = (int) (now()->startOfMonth()->timestamp * 1000);
+        $monthEnd   = (int) (now()->endOfMonth()->timestamp * 1000);
+        $monthTx        = $transactions->whereBetween('date', [$monthStart, $monthEnd]);
+        $monthlyIncome  = $monthTx->where('type', 'INCOME')->sum('amount');
+        $monthlyExpense = $monthTx->where('type', 'EXPENSE')->sum('amount');
+        $monthlyNet     = $monthlyIncome - $monthlyExpense;
+        $monthLabel     = now()->format('F Y');
 
         $jobs = StatementUpload::where('uid', $uid)
             ->orderByDesc('created_at')
@@ -50,7 +60,9 @@ class DashboardController extends Controller
 
         return view('portal.dashboard', compact(
             'transactions', 'goals', 'categories',
-            'totalIncome', 'totalExpense', 'netBalance', 'jobs',
+            'totalIncome', 'totalExpense', 'netBalance',
+            'monthlyIncome', 'monthlyExpense', 'monthlyNet', 'monthLabel',
+            'jobs',
         ));
     }
 }
