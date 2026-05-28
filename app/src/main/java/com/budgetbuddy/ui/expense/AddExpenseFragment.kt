@@ -45,6 +45,7 @@ class AddExpenseFragment : Fragment() {
     private var selectedDate = System.currentTimeMillis()
     private var receiptUri: Uri? = null
     private var isIncome = false
+    private var editId = -1L
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) { binding.ivReceiptPreview.setImageURI(receiptUri); binding.ivReceiptPreview.visibility = View.VISIBLE }
@@ -79,7 +80,7 @@ class AddExpenseFragment : Fragment() {
         binding.btnAttachReceipt.setOnClickListener { showReceiptOptions() }
 
         // Pre-fill when editing an existing transaction
-        val editId = arguments?.getLong("transactionId", -1L) ?: -1L
+        editId = arguments?.getLong("transactionId", -1L) ?: -1L
         if (editId > 0) {
             viewModel.loadTransaction(editId)
             viewLifecycleOwner.lifecycleScope.launch {
@@ -159,7 +160,8 @@ class AddExpenseFragment : Fragment() {
             date = selectedDate,
             notes = notes,
             receiptUri = receiptUri,
-            type = if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE
+            type = if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE,
+            existingId = editId
         )
     }
 
