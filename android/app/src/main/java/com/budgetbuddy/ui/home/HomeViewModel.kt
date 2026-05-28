@@ -15,9 +15,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeUiState(
-    val balance: Double = 0.0,             // income - expenses (all time)
+    val balance: Double = 0.0,             // income - expenses (this month)
     val totalIncomeThisMonth: Double = 0.0,
     val totalSpendThisMonth: Double = 0.0,
+    val allTimeIncome: Double = 0.0,
+    val allTimeExpense: Double = 0.0,
+    val allTimeBalance: Double = 0.0,
     val recentTransactions: List<TransactionEntity> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null
@@ -46,6 +49,7 @@ class HomeViewModel @Inject constructor(
         _userId.value = userId
         loadRecentTransactions(userId)
         loadMonthlyTotal(userId)
+        loadAllTimeTotal(userId)
         loadGoals(userId)
     }
 
@@ -69,7 +73,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val start = DateUtils.startOfMonth()
             val end = DateUtils.endOfMonth()
-            // Collect from a Flow so balance updates automatically when transactions change
             transactionRepository.getTransactionsByDateRange(userId, start, end).collect { transactions ->
                 val income  = transactions.filter { it.type == TransactionType.INCOME }.sumOf { it.amount }
                 val expense = transactions.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount }
@@ -78,6 +81,22 @@ class HomeViewModel @Inject constructor(
                         totalSpendThisMonth = expense,
                         totalIncomeThisMonth = income,
                         balance = income - expense
+                    )
+                }
+            }
+        }
+    }
+
+    private fun loadAllTimeTotal(userId: String) {
+        viewModelScope.launch {
+            transactionRepository.getAllTransactions(userId).collect { transactions ->
+                val income  = transactions.filter { it.type == TransactionType.INCOME }.sumOf { it.amount }
+                val expense = transactions.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount }
+                _uiState.update {
+                    it.copy(
+                        allTimeIncome  = income,
+                        allTimeExpense = expense,
+                        allTimeBalance = income - expense
                     )
                 }
             }

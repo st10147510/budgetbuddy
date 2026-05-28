@@ -72,8 +72,11 @@ class HomeFragment : Fragment() {
                     }
                     Pair(state, items)
                 }.collect { (state, items) ->
-                    // Balance = income − expenses for the current month
-                    binding.tvMonthlyTotal.text = CurrencyFormatter.format(requireContext(), state.balance)
+                    val ctx = requireContext()
+                    binding.tvMonthlyTotal.text  = CurrencyFormatter.format(ctx, state.balance)
+                    binding.tvMonthIncome.text   = "↑ ${CurrencyFormatter.format(ctx, state.totalIncomeThisMonth)}"
+                    binding.tvMonthExpense.text  = "↓ ${CurrencyFormatter.format(ctx, state.totalSpendThisMonth)}"
+                    binding.tvAllTimeBalance.text = CurrencyFormatter.format(ctx, state.allTimeBalance)
                     adapter.submitList(items)
                     binding.tvEmptyState.visibility =
                         if (state.recentTransactions.isEmpty()) View.VISIBLE else View.GONE
