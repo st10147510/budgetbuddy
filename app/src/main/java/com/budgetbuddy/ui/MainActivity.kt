@@ -41,7 +41,11 @@ class MainActivity : AppCompatActivity() {
         R.id.categoriesFragment,
         R.id.debtFragment,
         R.id.transactionListFragment,
-        R.id.paymentPlanFragment
+        R.id.paymentPlanFragment,
+        R.id.transactionDetailFragment,
+        R.id.goalDetailFragment,
+        R.id.debtDetailFragment,
+        R.id.budgetDetailFragment
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

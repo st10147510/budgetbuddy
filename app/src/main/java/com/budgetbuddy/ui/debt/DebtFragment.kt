@@ -34,6 +34,12 @@ class DebtFragment : Fragment() {
 
     private lateinit var userId: String
     private val adapter = DebtAdapter(
+        onItemClick = { debt ->
+            findNavController().navigate(
+                R.id.debtDetailFragment,
+                android.os.Bundle().apply { putLong("debtId", debt.id) }
+            )
+        },
         onDelete = { viewModel.deleteDebt(it) },
         onPayment = { showPaymentDialog(it) }
     )

@@ -26,6 +26,7 @@ class DebtRepository @Inject constructor(
 
     fun getActiveDebts(userId: String): Flow<List<DebtEntity>> = debtDao.getActiveDebts(userId)
     fun getAllDebts(userId: String): Flow<List<DebtEntity>> = debtDao.getAllDebts(userId)
+    suspend fun getDebtById(id: Long): DebtEntity? = debtDao.getDebtById(id)
 
     suspend fun insertDebt(debt: DebtEntity): Long {
         val id = debtDao.insertDebt(debt)

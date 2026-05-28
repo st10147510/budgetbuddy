@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.budgetbuddy.R
 import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentTransactionListBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +29,12 @@ class TransactionListFragment : Fragment() {
 
     @Inject lateinit var session: SessionManager
 
-    private val adapter = TransactionAdapter()
+    private val adapter = TransactionAdapter(onItemClick = { item ->
+        findNavController().navigate(
+            R.id.transactionDetailFragment,
+            android.os.Bundle().apply { putLong("transactionId", item.transaction.id) }
+        )
+    })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTransactionListBinding.inflate(inflater, container, false)

@@ -9,6 +9,7 @@ import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.databinding.ItemDebtBinding
 
 class DebtAdapter(
+    private val onItemClick: (DebtEntity) -> Unit,
     private val onDelete: (DebtEntity) -> Unit,
     private val onPayment: (DebtEntity) -> Unit
 ) : ListAdapter<DebtEntity, DebtAdapter.ViewHolder>(DIFF) {
@@ -37,6 +38,7 @@ class DebtAdapter(
             binding.progressDebt.progress = progressPct
             binding.tvProgress.text = "$progressPct%"
 
+            binding.root.setOnClickListener { onItemClick(item) }
             binding.btnDelete.setOnClickListener { onDelete(item) }
             binding.btnMakePayment.setOnClickListener { onPayment(item) }
         }

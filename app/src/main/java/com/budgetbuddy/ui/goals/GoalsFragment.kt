@@ -33,6 +33,12 @@ class GoalsFragment : Fragment() {
     @Inject lateinit var session: SessionManager
 
     private val adapter = GoalAdapter(
+        onItemClick = { goal ->
+            findNavController().navigate(
+                R.id.goalDetailFragment,
+                android.os.Bundle().apply { putLong("goalId", goal.id) }
+            )
+        },
         onAddSavings = { goal -> showAddSavingsDialog(goal) },
         onDelete = { goal -> viewModel.deleteGoal(goal) }
     )

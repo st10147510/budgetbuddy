@@ -9,6 +9,7 @@ import com.budgetbuddy.data.local.entities.GoalEntity
 import com.budgetbuddy.databinding.ItemGoalBinding
 
 class GoalAdapter(
+    private val onItemClick: (GoalEntity) -> Unit,
     private val onAddSavings: (GoalEntity) -> Unit,
     private val onDelete: (GoalEntity) -> Unit
 ) : ListAdapter<GoalEntity, GoalAdapter.ViewHolder>(DIFF) {
@@ -30,7 +31,7 @@ class GoalAdapter(
             binding.progressGoal.progress = pct.coerceIn(0, 100)
             binding.tvSaved.text = "Saved: R %.2f".format(item.savedAmount)
             binding.tvTarget.text = "Target: R %.2f".format(item.targetAmount)
-            binding.root.setOnClickListener { onAddSavings(item) }
+            binding.root.setOnClickListener { onItemClick(item) }
             binding.btnDelete.setOnClickListener { onDelete(item) }
         }
     }

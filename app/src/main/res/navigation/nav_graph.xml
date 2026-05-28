@@ -92,6 +92,39 @@
     </fragment>
 
     <fragment
+        android:id="@+id/transactionDetailFragment"
+        android:name="com.budgetbuddy.ui.expense.TransactionDetailFragment"
+        android:label="Transaction"
+        tools:layout="@layout/fragment_transaction_detail">
+        <argument android:name="transactionId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/goalDetailFragment"
+        android:name="com.budgetbuddy.ui.goals.GoalDetailFragment"
+        android:label="Goal Details"
+        tools:layout="@layout/fragment_goal_detail">
+        <argument android:name="goalId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/debtDetailFragment"
+        android:name="com.budgetbuddy.ui.debt.DebtDetailFragment"
+        android:label="Debt Details"
+        tools:layout="@layout/fragment_debt_detail">
+        <argument android:name="debtId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/budgetDetailFragment"
+        android:name="com.budgetbuddy.ui.budget.BudgetDetailFragment"
+        android:label="Budget Details"
+        tools:layout="@layout/fragment_budget_detail">
+        <argument android:name="budgetId" app:argType="long" android:defaultValue="-1L" />
+        <argument android:name="spent" app:argType="float" android:defaultValue="0.0" />
+    </fragment>
+
+    <fragment
         android:id="@+id/budgetFragment"
         android:name="com.budgetbuddy.ui.budget.BudgetFragment"
         android:label="Budget"

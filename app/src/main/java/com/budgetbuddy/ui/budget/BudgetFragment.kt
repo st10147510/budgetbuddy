@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.fragment.findNavController
+import com.budgetbuddy.R
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +35,18 @@ class BudgetFragment : Fragment() {
     @Inject lateinit var session: SessionManager
     @Inject lateinit var categoryRepository: CategoryRepository
 
-    private val adapter = BudgetAdapter { viewModel.deleteBudget(it.budget) }
+    private val adapter = BudgetAdapter(
+        onItemClick = { bws ->
+            findNavController().navigate(
+                R.id.budgetDetailFragment,
+                android.os.Bundle().apply {
+                    putLong("budgetId", bws.budget.id)
+                    putFloat("spent", bws.spent.toFloat())
+                }
+            )
+        },
+        onDelete = { viewModel.deleteBudget(it.budget) }
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentBudgetBinding.inflate(inflater, container, false)

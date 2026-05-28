@@ -20,6 +20,8 @@ class BudgetRepository @Inject constructor(
     suspend fun getBudgetForCategory(userId: String, categoryId: Long, month: Int, year: Int): BudgetEntity? =
         budgetDao.getBudgetForCategory(userId, categoryId, month, year)
 
+    suspend fun getBudgetById(id: Long): BudgetEntity? = budgetDao.getBudgetById(id)
+
     suspend fun insertOrUpdateBudget(budget: BudgetEntity): Long {
         val id = budgetDao.insertOrUpdateBudget(budget)
         try { firestoreRepository.saveBudget(budget.userId, budget.copy(id = id)) }

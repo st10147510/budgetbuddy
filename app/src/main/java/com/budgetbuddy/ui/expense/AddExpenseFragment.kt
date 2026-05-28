@@ -78,6 +78,27 @@ class AddExpenseFragment : Fragment() {
 
         binding.btnAttachReceipt.setOnClickListener { showReceiptOptions() }
 
+        // Pre-fill when editing an existing transaction
+        val editId = arguments?.getLong("transactionId", -1L) ?: -1L
+        if (editId > 0) {
+            viewModel.loadTransaction(editId)
+            viewLifecycleOwner.lifecycleScope.launch {
+                // Wait for categories to be ready, then pre-fill
+                viewModel.categories.collect { cats ->
+                    if (cats.isEmpty()) return@collect
+                    val tx = viewModel.getCurrentTransaction() ?: return@collect
+                    val cat = cats.firstOrNull { it.id == tx.categoryId }
+                    binding.etAmount.setText(tx.amount.toBigDecimal().stripTrailingZeros().toPlainString())
+                    if (cat != null) binding.actvCategory.setText("${cat.icon} ${cat.name}", false)
+                    binding.etNotes.setText(tx.notes ?: "")
+                    selectedDate = tx.date
+                    updateDateDisplay()
+                    isIncome = tx.type == com.budgetbuddy.data.local.entities.TransactionType.INCOME
+                    binding.tabTransactionType.getTabAt(if (isIncome) 1 else 0)?.select()
+                }
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.categories.collect { categories ->

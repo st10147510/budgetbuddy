@@ -144,6 +144,59 @@
     <!-- Categories -->
     <string name="categories">Categories</string>
 
+    <!-- Detail / Edit screens -->
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="delete_goal_message">Delete this goal? This cannot be undone.</string>
+    <string name="delete_debt_message">Delete this debt? This cannot be undone.</string>
+    <string name="delete_budget_message">Delete this budget? This cannot be undone.</string>
+    <string name="delete_transaction_message">Delete this transaction? This cannot be undone.</string>
+    <string name="goal_detail">Goal Details</string>
+    <string name="debt_detail">Debt Details</string>
+    <string name="budget_detail">Budget Details</string>
+    <string name="transaction_detail">Transaction Details</string>
+    <string name="edit_goal">Edit Goal</string>
+    <string name="edit_debt">Edit Debt</string>
+    <string name="edit_budget">Edit Budget</string>
+    <string name="label_target">Target</string>
+    <string name="label_saved">Saved</string>
+    <string name="label_progress">Progress</string>
+    <string name="label_target_date">Target Date</string>
+    <string name="label_status">Status</string>
+    <string name="label_created">Created</string>
+    <string name="label_original_balance">Original Balance</string>
+    <string name="label_current_balance">Current Balance</string>
+    <string name="label_interest_rate">Interest Rate</string>
+    <string name="label_min_payment">Min. Payment</string>
+    <string name="label_paid_off">Paid Off</string>
+    <string name="label_category">Category</string>
+    <string name="label_period">Period</string>
+    <string name="label_limit">Limit</string>
+    <string name="label_min_goal">Min. Goal</string>
+    <string name="label_spent">Spent</string>
+    <string name="label_remaining">Remaining</string>
+    <string name="label_amount">Amount</string>
+    <string name="label_type">Type</string>
+    <string name="label_date">Date</string>
+    <string name="label_notes">Notes</string>
+    <string name="label_receipt">Receipt</string>
+    <string name="no_notes">—</string>
+    <string name="no_date">No date set</string>
+    <string name="no_receipt">No receipt attached</string>
+    <string name="goal_completed">Completed</string>
+    <string name="goal_in_progress">In Progress</string>
+    <string name="debt_paid_off">Paid Off</string>
+    <string name="debt_active">Active</string>
+    <string name="make_payment">Make Payment</string>
+    <string name="add_savings">Add Savings</string>
+    <string name="hint_interest_rate">Interest rate (% per year)</string>
+    <string name="hint_min_payment">Minimum monthly payment</string>
+    <string name="hint_limit_amount">Spending limit</string>
+    <string name="hint_min_amount">Minimum goal (optional)</string>
+    <string name="receipt_image">Receipt image</string>
+
     <!-- Errors -->
     <string name="error_empty_email">Please enter your email address</string>
     <string name="error_invalid_email">Please enter a valid email address</string>

@@ -11,6 +11,7 @@ import com.budgetbuddy.R
 import com.budgetbuddy.databinding.ItemBudgetBinding
 
 class BudgetAdapter(
+    private val onItemClick: (BudgetWithSpend) -> Unit,
     private val onDelete: (BudgetWithSpend) -> Unit
 ) : ListAdapter<BudgetWithSpend, BudgetAdapter.ViewHolder>(DIFF) {
 
@@ -53,6 +54,7 @@ class BudgetAdapter(
                 binding.tvMinGoal.visibility = View.GONE
             }
 
+            binding.root.setOnClickListener { onItemClick(item) }
             binding.btnDelete.setOnClickListener { onDelete(item) }
         }
     }
