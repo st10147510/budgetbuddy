@@ -44,6 +44,23 @@ class FirestoreService
         }
     }
 
+    /**
+     * Fetch one collection for each UID and return a flat array.
+     * Each document gets a '_uid' key injected for grouping.
+     * Silently skips users whose collection is empty or errors.
+     */
+    public function getAllUsersCollection(array $uids, string $collection): array
+    {
+        $all = [];
+        foreach ($uids as $uid) {
+            foreach ($this->getCollection($uid, $collection) as $doc) {
+                $doc['_uid'] = $uid;
+                $all[] = $doc;
+            }
+        }
+        return $all;
+    }
+
     public function getUserDocument(string $userId): array
     {
         try {

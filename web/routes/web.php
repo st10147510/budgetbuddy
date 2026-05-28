@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\InsightsController;
+use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\UploadMonitorController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Portal\AuthController as PortalAuthController;
 use App\Http\Controllers\Portal\DashboardController as PortalDashboardController;
@@ -21,12 +24,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::prefix('users')->name('users.')->group(function () {
+            Route::get('export',      [UserController::class, 'export'])->name('export');
             Route::get('/',           [UserController::class, 'index'])->name('index');
             Route::get('{uid}',       [UserController::class, 'show'])->name('show');
             Route::post('{uid}/disable',        [UserController::class, 'disable'])->name('disable');
             Route::post('{uid}/enable',         [UserController::class, 'enable'])->name('enable');
             Route::post('{uid}/reset-password', [UserController::class, 'resetPassword'])->name('reset-password');
             Route::delete('{uid}',   [UserController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::get('insights',           [InsightsController::class, 'index'])->name('insights');
+        Route::get('transactions',        [TransactionController::class, 'index'])->name('transactions');
+        Route::prefix('uploads')->name('uploads.')->group(function () {
+            Route::get('/',          [UploadMonitorController::class, 'index'])->name('index');
+            Route::post('{id}/retry',[UploadMonitorController::class, 'retry'])->name('retry');
         });
     });
 });

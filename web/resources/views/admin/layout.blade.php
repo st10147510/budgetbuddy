@@ -29,18 +29,40 @@
         </div>
 
         {{-- Nav --}}
-        <nav class="flex-1 py-4 space-y-0.5 px-3">
+        <nav class="flex-1 py-4 px-3 space-y-0.5">
+
+            <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 pt-1 pb-2">Overview</p>
             <a href="{{ route('admin.dashboard') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                       {{ request()->routeIs('admin.dashboard') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
                 <i class="bi bi-speedometer2 text-base"></i>
                 Dashboard
             </a>
+            <a href="{{ route('admin.insights') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                      {{ request()->routeIs('admin.insights') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
+                <i class="bi bi-bar-chart-line text-base"></i>
+                Insights
+            </a>
+
+            <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 pt-4 pb-2">Manage</p>
             <a href="{{ route('admin.users.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                       {{ request()->routeIs('admin.users.*') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
                 <i class="bi bi-people text-base"></i>
                 Users
+            </a>
+            <a href="{{ route('admin.transactions') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                      {{ request()->routeIs('admin.transactions') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
+                <i class="bi bi-receipt text-base"></i>
+                Transactions
+            </a>
+            <a href="{{ route('admin.uploads.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                      {{ request()->routeIs('admin.uploads.*') ? 'nav-active' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]' }}">
+                <i class="bi bi-cloud-upload text-base"></i>
+                Uploads
             </a>
         </nav>
 

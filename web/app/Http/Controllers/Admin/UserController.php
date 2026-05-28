@@ -172,4 +172,34 @@ class UserController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+
+    public function export()
+    {
+        $rows = [['UID', 'Email', 'Display Name', 'Created At', 'Last Sign-In', 'Status']];
+
+        try {
+            foreach (app(Auth::class)->listUsers(1000) as $user) {
+                $rows[] = [
+                    $user->uid,
+                    $user->email ?? '',
+                    $user->displayName ?? '',
+                    $user->metadata->createdAt?->format('Y-m-d H:i:s') ?? '',
+                    $user->metadata->lastLoginAt?->format('Y-m-d H:i:s') ?? '',
+                    $user->disabled ? 'disabled' : 'active',
+                ];
+            }
+        } catch (Throwable) {}
+
+        $csv = implode("\n", array_map(
+            fn ($row) => implode(',', array_map(
+                fn ($v) => '"' . str_replace('"', '""', $v) . '"', $row
+            )),
+            $rows
+        ));
+
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="budgetbuddy-users-' . now()->format('Y-m-d') . '.csv"',
+        ]);
+    }
 }

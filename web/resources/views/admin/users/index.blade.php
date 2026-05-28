@@ -45,6 +45,12 @@
                 </a>
             @endif
         </form>
+        <a href="{{ route('admin.users.export') }}"
+           class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900
+                  rounded-lg border border-slate-300 hover:border-slate-400 bg-white transition-colors">
+            <i class="bi bi-download text-sm"></i>
+            Export CSV
+        </a>
     </div>
 
     {{-- Table --}}
