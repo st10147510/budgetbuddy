@@ -105,7 +105,7 @@ class AddExpenseFragment : Fragment() {
                 viewModel.categories.collect { categories ->
                     val names = categories.map { "${it.icon} ${it.name}" }
                     binding.actvCategory.setAdapter(
-                        ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
+                        ArrayAdapter(requireContext(), R.layout.item_dropdown, names)
                     )
                 }
             }

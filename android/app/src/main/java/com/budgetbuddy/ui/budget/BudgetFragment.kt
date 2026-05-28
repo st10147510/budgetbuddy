@@ -88,7 +88,7 @@ class BudgetFragment : Fragment() {
 
             var selectedCategory: CategoryEntity = categories[0]
             val labels = categories.map { "${it.icon} ${it.name}" }
-            val dropdownAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, labels)
+            val dropdownAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown, labels)
             dialogBinding.actvCategory.setAdapter(dropdownAdapter)
             dialogBinding.actvCategory.setText(labels[0], false)
             dialogBinding.actvCategory.setOnItemClickListener { _, _, position, _ ->

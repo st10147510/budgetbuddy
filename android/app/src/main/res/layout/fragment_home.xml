@@ -54,7 +54,7 @@
                     android:id="@+id/btnAddExpense"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:text="+ Add"
+                    android:text="Add"
                     android:textSize="13sp"
                     android:textColor="@color/background"
                     app:backgroundTint="@color/teal_accent"
