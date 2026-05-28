@@ -18,6 +18,7 @@ import com.budgetbuddy.R
 import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentReportsBinding
 import com.budgetbuddy.ui.expense.TransactionAdapter
+import com.budgetbuddy.util.CurrencyFormatter
 import com.budgetbuddy.ui.expense.TransactionWithCategory
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -83,7 +84,7 @@ class ReportsFragment : Fragment() {
                     Pair(state, items)
                 }.collect { (state, items) ->
                     // Balance = income − expense for selected month
-                    binding.tvBalance.text = "R %.2f".format(state.balance)
+                    binding.tvBalance.text = CurrencyFormatter.format(requireContext(), state.balance)
 
                     // Month label
                     binding.tvSelectedMonth.text = SimpleDateFormat("MMM yyyy", Locale.getDefault())

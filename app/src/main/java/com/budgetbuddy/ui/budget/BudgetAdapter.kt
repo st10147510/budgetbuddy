@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.budgetbuddy.R
 import com.budgetbuddy.databinding.ItemBudgetBinding
+import com.budgetbuddy.util.CurrencyFormatter
 
 class BudgetAdapter(
     private val onItemClick: (BudgetWithSpend) -> Unit,
@@ -28,12 +29,12 @@ class BudgetAdapter(
         fun bind(item: BudgetWithSpend) {
             binding.tvCategoryIcon.text = item.category.icon
             binding.tvCategoryName.text = item.category.name
-            binding.tvSpent.text = "R %.2f".format(item.spent)
-            binding.tvLimit.text = "R %.2f".format(item.budget.limitAmount)
+            val ctx = binding.root.context
+            binding.tvSpent.text = CurrencyFormatter.format(ctx, item.spent)
+            binding.tvLimit.text = CurrencyFormatter.format(ctx, item.budget.limitAmount)
             binding.tvPercent.text = "${item.progressPercent}%"
             binding.progressBudget.progress = item.progressPercent.coerceIn(0, 100)
 
-            val ctx = itemView.context
             val (statusColor, chipLabel) = when (item.status) {
                 BudgetStatus.OK       -> ContextCompat.getColor(ctx, R.color.green_ok)   to "On Track"
                 BudgetStatus.WARNING  -> ContextCompat.getColor(ctx, R.color.amber_warning) to "Near Limit"
@@ -49,7 +50,7 @@ class BudgetAdapter(
 
             if (item.budget.minAmount > 0) {
                 binding.tvMinGoal.visibility = View.VISIBLE
-                binding.tvMinGoal.text = "Min goal: R %.2f".format(item.budget.minAmount)
+                binding.tvMinGoal.text = ctx.getString(com.budgetbuddy.R.string.min_goal_label, CurrencyFormatter.format(ctx, item.budget.minAmount))
             } else {
                 binding.tvMinGoal.visibility = View.GONE
             }

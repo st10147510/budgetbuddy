@@ -16,6 +16,7 @@ import com.budgetbuddy.data.local.entities.GoalEntity
 import com.budgetbuddy.databinding.DialogAddSavingsBinding
 import com.budgetbuddy.databinding.DialogEditGoalBinding
 import com.budgetbuddy.databinding.FragmentGoalDetailBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import com.budgetbuddy.util.DateUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -81,8 +82,8 @@ class GoalDetailFragment : Fragment() {
         binding.tvGoalName.text = goal.name
         binding.progressGoal.progress = pct.coerceIn(0, 100)
         binding.tvPercent.text = "$pct%"
-        binding.tvSaved.text = "R %.2f".format(goal.savedAmount)
-        binding.tvTarget.text = "R %.2f".format(goal.targetAmount)
+        binding.tvSaved.text = CurrencyFormatter.format(requireContext(), goal.savedAmount)
+        binding.tvTarget.text = CurrencyFormatter.format(requireContext(), goal.targetAmount)
         binding.tvTargetDate.text = goal.targetDate?.let { DateUtils.formatDate(it) } ?: getString(R.string.no_date)
         binding.tvCreatedAt.text = DateUtils.formatDate(goal.createdAt)
 

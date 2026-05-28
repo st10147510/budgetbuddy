@@ -3,10 +3,12 @@ package com.budgetbuddy
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.budgetbuddy.ui.notifications.NotificationScheduler
+import com.budgetbuddy.util.LocaleHelper
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -19,6 +21,10 @@ class BudgetBuddyApp : Application(), Configuration.Provider {
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base))
+    }
 
     override fun onCreate() {
         super.onCreate()

@@ -20,6 +20,8 @@ import androidx.navigation.fragment.findNavController
 import com.budgetbuddy.R
 import com.budgetbuddy.databinding.FragmentProfileBinding
 import com.budgetbuddy.ui.auth.AuthViewModel
+import com.budgetbuddy.util.CurrencyFormatter
+import com.budgetbuddy.util.LocaleHelper
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,6 +69,7 @@ class ProfileFragment : Fragment() {
         binding.tvCategories.setOnClickListener { findNavController().navigate(R.id.categoriesFragment) }
         binding.tvBadges.setOnClickListener { findNavController().navigate(R.id.badgesFragment) }
         binding.tvNotifications.setOnClickListener { /* future */ }
+        binding.tvLanguage.setOnClickListener { showLanguagePicker() }
 
         binding.btnSyncCloud.setOnClickListener { profileViewModel.syncToCloud() }
 
@@ -134,6 +137,25 @@ class ProfileFragment : Fragment() {
             .also { it.parentFile?.mkdirs() }
         cameraUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", imgFile)
         takePicture.launch(cameraUri)
+    }
+
+    private fun showLanguagePicker() {
+        val languages = LocaleHelper.getSupportedLanguages()
+        val currentTag = LocaleHelper.getSavedTag(requireContext())
+        val currentIndex = languages.indexOfFirst { it.tag == currentTag }.coerceAtLeast(0)
+        val names = languages.map { it.displayName }.toTypedArray()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.select_language))
+            .setSingleChoiceItems(names, currentIndex) { dialog, which ->
+                val chosen = languages[which]
+                LocaleHelper.setLanguage(requireContext(), chosen.tag)
+                CurrencyFormatter.resetCache()
+                dialog.dismiss()
+                requireActivity().recreate()
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 
     private fun loadAvatar(url: String?) {

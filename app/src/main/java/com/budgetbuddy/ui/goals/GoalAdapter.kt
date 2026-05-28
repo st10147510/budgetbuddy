@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.budgetbuddy.data.local.entities.GoalEntity
 import com.budgetbuddy.databinding.ItemGoalBinding
+import com.budgetbuddy.util.CurrencyFormatter
 
 class GoalAdapter(
     private val onItemClick: (GoalEntity) -> Unit,
@@ -29,8 +30,9 @@ class GoalAdapter(
             val pct = item.progressPercent
             binding.tvPercent.text = "$pct%"
             binding.progressGoal.progress = pct.coerceIn(0, 100)
-            binding.tvSaved.text = "Saved: R %.2f".format(item.savedAmount)
-            binding.tvTarget.text = "Target: R %.2f".format(item.targetAmount)
+            val ctx = binding.root.context
+            binding.tvSaved.text = ctx.getString(com.budgetbuddy.R.string.goal_saved_label, CurrencyFormatter.format(ctx, item.savedAmount))
+            binding.tvTarget.text = ctx.getString(com.budgetbuddy.R.string.goal_target_label, CurrencyFormatter.format(ctx, item.targetAmount))
             binding.root.setOnClickListener { onItemClick(item) }
             binding.btnDelete.setOnClickListener { onDelete(item) }
         }

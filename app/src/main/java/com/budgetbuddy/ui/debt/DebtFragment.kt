@@ -17,6 +17,7 @@ import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.databinding.DialogAddDebtBinding
 import com.budgetbuddy.databinding.DialogMakePaymentBinding
 import com.budgetbuddy.databinding.FragmentDebtBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -105,7 +106,7 @@ class DebtFragment : Fragment() {
         sheet?.setBackgroundResource(android.R.color.transparent)
 
         dialogBinding.tvPaymentTitle.text = "Pay — ${debt.name}"
-        dialogBinding.tvDebtBalance.text = "Outstanding: R %.2f".format(debt.balance)
+        dialogBinding.tvDebtBalance.text = getString(R.string.outstanding_label, CurrencyFormatter.format(requireContext(), debt.balance))
 
         dialogBinding.btnPay.setOnClickListener {
             val amount = dialogBinding.etAmount.text.toString().toDoubleOrNull()

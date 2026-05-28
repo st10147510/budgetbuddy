@@ -19,6 +19,7 @@ import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.data.repository.CategoryRepository
 import com.budgetbuddy.data.repository.TransactionRepository
 import com.budgetbuddy.databinding.FragmentTransactionDetailBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import com.budgetbuddy.util.DateUtils
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -118,7 +119,7 @@ class TransactionDetailFragment : Fragment() {
             requireContext().getColor(R.color.income_green)
         else requireContext().getColor(R.color.expense_red)
 
-        binding.tvAmount.text = "$sign R %.2f".format(tx.amount)
+        binding.tvAmount.text = "$sign${CurrencyFormatter.format(requireContext(), tx.amount)}"
         binding.tvAmount.setTextColor(color)
         binding.tvType.text = if (tx.type == TransactionType.INCOME) "Income" else "Expense"
         binding.tvCategory.text = "$categoryIcon $categoryName"

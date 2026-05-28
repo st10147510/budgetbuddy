@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.budgetbuddy.data.local.entities.TransactionEntity
 import com.budgetbuddy.data.local.entities.TransactionType
 import com.budgetbuddy.databinding.ItemTransactionBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import com.budgetbuddy.util.DateUtils
 
 data class TransactionWithCategory(
@@ -37,7 +38,7 @@ class TransactionAdapter(
             binding.tvNotes.text = item.transaction.notes ?: ""
             binding.tvDate.text = DateUtils.formatDate(item.transaction.date)
             val sign = if (item.transaction.type == TransactionType.INCOME) "+" else "-"
-            binding.tvAmount.text = "$sign R %.2f".format(item.transaction.amount)
+            binding.tvAmount.text = "$sign${CurrencyFormatter.format(itemView.context, item.transaction.amount)}"
             binding.tvAmount.setTextColor(
                 if (item.transaction.type == TransactionType.INCOME)
                     itemView.context.getColor(com.budgetbuddy.R.color.income_green)

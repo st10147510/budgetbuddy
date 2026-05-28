@@ -7,13 +7,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.budgetbuddy.data.local.entities.GoalEntity
 import com.budgetbuddy.databinding.ItemGoalPreviewBinding
+import com.budgetbuddy.util.CurrencyFormatter
 
 class GoalPreviewAdapter : ListAdapter<GoalEntity, GoalPreviewAdapter.VH>(DIFF) {
 
     inner class VH(private val b: ItemGoalPreviewBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(goal: GoalEntity) {
             b.tvGoalName.text = goal.name
-            b.tvGoalAmount.text = "R %.2f".format(goal.savedAmount)
+            b.tvGoalAmount.text = CurrencyFormatter.format(b.root.context, goal.savedAmount)
         }
     }
 

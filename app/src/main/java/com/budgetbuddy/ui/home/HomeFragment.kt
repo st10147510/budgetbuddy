@@ -16,6 +16,7 @@ import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.databinding.FragmentHomeBinding
 import com.budgetbuddy.ui.expense.TransactionAdapter
 import com.budgetbuddy.ui.expense.TransactionWithCategory
+import com.budgetbuddy.util.CurrencyFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -72,7 +73,7 @@ class HomeFragment : Fragment() {
                     Pair(state, items)
                 }.collect { (state, items) ->
                     // Balance = income − expenses for the current month
-                    binding.tvMonthlyTotal.text = "R %.2f".format(state.balance)
+                    binding.tvMonthlyTotal.text = CurrencyFormatter.format(requireContext(), state.balance)
                     adapter.submitList(items)
                     binding.tvEmptyState.visibility =
                         if (state.recentTransactions.isEmpty()) View.VISIBLE else View.GONE

@@ -88,11 +88,11 @@
     <string name="calculate_plan">Calculate Plan</string>
     <string name="select_plan">Select</string>
     <string name="plan_months">%1$d months</string>
-    <string name="plan_interest">Interest: R %1$.2f</string>
-    <string name="plan_total">Total: R %1$.2f</string>
+    <string name="plan_interest">Interest: %1$s</string>
+    <string name="plan_total">Total: %1$s</string>
     <string name="schedule_title">Month-by-month plan</string>
     <string name="month_header">Month %1$d</string>
-    <string name="schedule_balance">Bal: R %1$.2f</string>
+    <string name="schedule_balance">Bal: %1$s</string>
     <string name="no_active_debts_plan">Add debts to see your payoff plan.</string>
     <string name="plan_calculating">Calculating…</string>
 
@@ -103,6 +103,8 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="notifications">Notifications</string>
     <string name="badges">My Badges</string>
+    <string name="language">Language</string>
+    <string name="select_language">Select Language</string>
 
     <!-- Welcome / Auth -->
     <string name="welcome_subtitle">Take control of your finances with smart budgeting and tracking</string>
@@ -196,6 +198,14 @@
     <string name="hint_limit_amount">Spending limit</string>
     <string name="hint_min_amount">Minimum goal (optional)</string>
     <string name="receipt_image">Receipt image</string>
+
+    <!-- Currency-embedded labels (currency symbol injected at runtime) -->
+    <string name="min_payment_per_month">Min: %1$s/mo</string>
+    <string name="min_goal_label">Min goal: %1$s</string>
+    <string name="outstanding_label">Outstanding: %1$s</string>
+    <string name="goal_saved_label">Saved: %1$s</string>
+    <string name="goal_target_label">Target: %1$s</string>
+    <string name="currency_per_month">%1$s / month</string>
 
     <!-- Errors -->
     <string name="error_empty_email">Please enter your email address</string>

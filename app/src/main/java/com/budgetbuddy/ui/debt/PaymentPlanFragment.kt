@@ -15,6 +15,7 @@ import com.budgetbuddy.R
 import com.budgetbuddy.data.local.SessionManager
 import com.budgetbuddy.data.local.entities.PayoffStrategy
 import com.budgetbuddy.databinding.FragmentPaymentPlanBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -89,15 +90,15 @@ class PaymentPlanFragment : Fragment() {
         // Snowball summary
         state.snowball?.let { s ->
             binding.tvSnowballMonths.text = getString(R.string.plan_months, s.totalMonths)
-            binding.tvSnowballInterest.text = getString(R.string.plan_interest, s.totalInterestPaid)
-            binding.tvSnowballTotal.text = getString(R.string.plan_total, s.totalPaid)
+            binding.tvSnowballInterest.text = getString(R.string.plan_interest, CurrencyFormatter.format(requireContext(), s.totalInterestPaid))
+            binding.tvSnowballTotal.text = getString(R.string.plan_total, CurrencyFormatter.format(requireContext(), s.totalPaid))
         }
 
         // Avalanche summary
         state.avalanche?.let { a ->
             binding.tvAvalancheMonths.text = getString(R.string.plan_months, a.totalMonths)
-            binding.tvAvalancheInterest.text = getString(R.string.plan_interest, a.totalInterestPaid)
-            binding.tvAvalancheTotal.text = getString(R.string.plan_total, a.totalPaid)
+            binding.tvAvalancheInterest.text = getString(R.string.plan_interest, CurrencyFormatter.format(requireContext(), a.totalInterestPaid))
+            binding.tvAvalancheTotal.text = getString(R.string.plan_total, CurrencyFormatter.format(requireContext(), a.totalPaid))
         }
 
         // Selected card highlight (4dp stroke = 12px at mdpi; use resources for density independence)

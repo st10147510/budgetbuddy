@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.budgetbuddy.R
 import com.budgetbuddy.databinding.DialogEditBudgetBinding
 import com.budgetbuddy.databinding.FragmentBudgetDetailBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,10 +78,10 @@ class BudgetDetailFragment : Fragment() {
                     cal.set(Calendar.MONTH, budget.month - 1)
                     cal.set(Calendar.YEAR, budget.year)
                     binding.tvPeriod.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.time)
-                    binding.tvSpent.text = "R %.2f".format(spentAmount)
-                    binding.tvLimit.text = "R %.2f".format(budget.limitAmount)
-                    binding.tvRemaining.text = "R %.2f".format(remaining)
-                    binding.tvMinGoal.text = if (budget.minAmount > 0) "R %.2f".format(budget.minAmount) else "—"
+                    binding.tvSpent.text = CurrencyFormatter.format(requireContext(), spentAmount)
+                    binding.tvLimit.text = CurrencyFormatter.format(requireContext(), budget.limitAmount)
+                    binding.tvRemaining.text = CurrencyFormatter.format(requireContext(), remaining)
+                    binding.tvMinGoal.text = if (budget.minAmount > 0) CurrencyFormatter.format(requireContext(), budget.minAmount) else "—"
 
                     val status = when {
                         pct >= 100 -> BudgetStatus.EXCEEDED

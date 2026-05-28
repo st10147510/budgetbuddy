@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.databinding.ItemDebtBinding
+import com.budgetbuddy.util.CurrencyFormatter
 
 class DebtAdapter(
     private val onItemClick: (DebtEntity) -> Unit,
@@ -27,8 +28,9 @@ class DebtAdapter(
         fun bind(item: DebtEntity) {
             binding.tvDebtName.text = item.name
             binding.tvInterestRate.text = "%.1f%% interest".format(item.interestRate)
-            binding.tvBalance.text = "R %.2f".format(item.balance)
-            binding.tvMinPayment.text = "Min: R %.2f/mo".format(item.minimumPayment)
+            val ctx = binding.root.context
+            binding.tvBalance.text = CurrencyFormatter.format(ctx, item.balance)
+            binding.tvMinPayment.text = ctx.getString(com.budgetbuddy.R.string.min_payment_per_month, CurrencyFormatter.format(ctx, item.minimumPayment))
 
             // Payoff progress: (originalBalance - currentBalance) / originalBalance * 100
             val progressPct = if (item.originalBalance > 0) {

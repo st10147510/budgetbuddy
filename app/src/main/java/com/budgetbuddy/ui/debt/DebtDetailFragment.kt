@@ -15,6 +15,7 @@ import com.budgetbuddy.data.local.entities.DebtEntity
 import com.budgetbuddy.databinding.DialogEditDebtBinding
 import com.budgetbuddy.databinding.DialogMakePaymentBinding
 import com.budgetbuddy.databinding.FragmentDebtDetailBinding
+import com.budgetbuddy.util.CurrencyFormatter
 import com.budgetbuddy.util.DateUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -79,12 +80,12 @@ class DebtDetailFragment : Fragment() {
             ((debt.originalBalance - debt.balance) / debt.originalBalance * 100).toInt().coerceIn(0, 100) else 0
 
         binding.tvDebtName.text = debt.name
-        binding.tvBalance.text = "R %.2f".format(debt.balance)
+        binding.tvBalance.text = CurrencyFormatter.format(requireContext(), debt.balance)
         binding.progressDebt.progress = payoffPct
         binding.tvPayoffPercent.text = "$payoffPct% paid off"
-        binding.tvOriginalBalance.text = "R %.2f".format(debt.originalBalance)
+        binding.tvOriginalBalance.text = CurrencyFormatter.format(requireContext(), debt.originalBalance)
         binding.tvInterestRate.text = "%.2f%% per year".format(debt.interestRate)
-        binding.tvMinPayment.text = "R %.2f / month".format(debt.minimumPayment)
+        binding.tvMinPayment.text = getString(R.string.currency_per_month, CurrencyFormatter.format(requireContext(), debt.minimumPayment))
         binding.tvCreatedAt.text = DateUtils.formatDate(debt.createdAt)
 
         val (statusText, statusColor) = if (debt.isPaidOff)
@@ -131,7 +132,7 @@ class DebtDetailFragment : Fragment() {
             ?.setBackgroundResource(android.R.color.transparent)
 
         db.tvPaymentTitle.text = "Pay — ${debt.name}"
-        db.tvDebtBalance.text = "Outstanding: R %.2f".format(debt.balance)
+        db.tvDebtBalance.text = getString(R.string.outstanding_label, CurrencyFormatter.format(requireContext(), debt.balance))
 
         db.btnPay.setOnClickListener {
             val amount = db.etAmount.text.toString().toDoubleOrNull()

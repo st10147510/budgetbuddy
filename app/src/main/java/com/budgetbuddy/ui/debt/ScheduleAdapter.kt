@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.budgetbuddy.databinding.ItemScheduleDebtBinding
 import com.budgetbuddy.databinding.ItemScheduleHeaderBinding
+import com.budgetbuddy.util.CurrencyFormatter
 
 class ScheduleAdapter : ListAdapter<ScheduleRow, RecyclerView.ViewHolder>(DIFF) {
 
@@ -62,9 +63,10 @@ class ScheduleAdapter : ListAdapter<ScheduleRow, RecyclerView.ViewHolder>(DIFF) 
         RecyclerView.ViewHolder(b.root) {
         fun bind(row: ScheduleRow.DebtRow) {
             b.tvDebtName.text = row.debtName
-            b.tvPayment.text = "R %.2f".format(row.payment)
-            b.tvBalance.text = b.root.context.getString(
-                com.budgetbuddy.R.string.schedule_balance, row.remainingBalance
+            val ctx = b.root.context
+            b.tvPayment.text = CurrencyFormatter.format(ctx, row.payment)
+            b.tvBalance.text = ctx.getString(
+                com.budgetbuddy.R.string.schedule_balance, CurrencyFormatter.format(ctx, row.remainingBalance)
             )
         }
     }

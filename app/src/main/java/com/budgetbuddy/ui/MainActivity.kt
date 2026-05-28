@@ -1,6 +1,7 @@
 package com.budgetbuddy.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.budgetbuddy.R
 import com.budgetbuddy.databinding.ActivityMainBinding
+import com.budgetbuddy.util.LocaleHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,6 +49,10 @@ class MainActivity : AppCompatActivity() {
         R.id.debtDetailFragment,
         R.id.budgetDetailFragment
     )
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
