@@ -1,6 +1,6 @@
-# Claude                                                    
-CLAUDE.md                                                                                                                                                                         
-.claude/    
+# Claude
+CLAUDE.md
+.claude/
 
 # Copilot
 .copilot/
@@ -8,22 +8,37 @@ CLAUDE.md
 # VSCode
 .vscode/
 
-# Kotlin
+# JetBrains
 .idea/
-*.orig 
+*.orig
 
-# Google Services (do not commit credentials)                                                                                                                        
-app/google-services.json  
+# macOS
+*.DS_Store
 
-# Docs                                                                                                                                                                            
+# Docs
 docs/
 
-# Android / Gradle build artifacts                                                                                                                                   
-*.iml                                                                                                                                                                
-.gradle/                                                                                                                                                             
-build/                                                                                                                                                               
-local.properties                                                                                                                                                     
-*.DS_Store                                                                                                                                                           
-captures/                                                                                                                                                            
-.externalNativeBuild/                                                                                                                                                
-.cxx/  
+# ── Android ──────────────────────────────────────────────────────────────────
+android/app/google-services.json
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/*.iml
+android/captures/
+android/.externalNativeBuild/
+android/.cxx/
+
+# ── Web (Laravel) ────────────────────────────────────────────────────────────
+web/.env
+web/vendor/
+web/node_modules/
+web/storage/logs/
+web/storage/framework/cache/
+web/storage/framework/sessions/
+web/storage/framework/views/
+web/bootstrap/cache/
+web/public/hot
+web/public/storage
+web/*.key
+web/firebase-service-account.json
