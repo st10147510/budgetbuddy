@@ -2,16 +2,45 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /profile_photos/{filename} { 
-    	// Changed from {userId}.jpg to {filename}
-      // The filename should be the user's UID followed by ".jpg"
-      allow read, write: if request.auth != null && filename == request.auth.uid + ".jpg";
+
+    // ── Profile photos ────────────────────────────────────────────────────────
+    match /profile_photos/{filename} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+                   && filename == request.auth.uid + ".jpg"
+                   && request.resource.size < 5 * 1024 * 1024          // 5 MB max
+                   && request.resource.contentType.matches('image/.*'); // images only
     }
+
+    // ── Receipt photos ────────────────────────────────────────────────────────
     match /receipts/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && request.resource.size < 10 * 1024 * 1024          // 10 MB max
+                   && request.resource.contentType.matches('image/.*');
     }
+
+    // ── Bank statements (uploaded by web service account — no client write) ───
+    // Clients may only read their own statements; write is service-account only.
     match /bank_statements/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // service account bypasses rules via Admin SDK
+    }
+
+    // ── Policy documents (managed by web admin — public read) ─────────────────
+    // The web admin uploads PDF versions of each policy via the service account.
+    // Files are named terms.pdf / privacy.pdf under this path.
+    // Policies are public-facing documents so any client may read them.
+    // Write is blocked for clients; the service account bypasses rules via Admin SDK.
+    match /policies/{filename} {
+      allow read: if true;   // public — no auth required (same as /terms and /privacy web pages)
+      allow write: if false; // service account only via Admin SDK
+    }
+
+    // ── Deny everything else ──────────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }
