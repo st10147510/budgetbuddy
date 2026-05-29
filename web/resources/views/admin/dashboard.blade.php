@@ -260,8 +260,10 @@
                 Manage Users
             </a>
             <a href="{{ route('portal.dashboard') }}" target="_blank"
-               class="flex items-center gap-3 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium
-                      rounded-xl transition-colors duration-150">
+               class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-150"
+               style="background:rgba(255,255,255,0.06);color:#ccc"
+               onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+               onmouseout="this.style.background='rgba(255,255,255,0.06)'">
                 <i class="bi bi-box-arrow-up-right"></i>
                 Open User Portal
             </a>
@@ -327,11 +329,11 @@
                 callbacks: { label: ctx => ` ${ctx.raw} new user${ctx.raw !== 1 ? 's' : ''}` },
             }},
             scales: {
-                x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } },
                 y: {
                     min: 0, max: max + 1,
-                    ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1, precision: 0 },
-                    grid: { color: '#f1f5f9' },
+                    ticks: { color: '#666', font: { size: 10 }, stepSize: 1, precision: 0 },
+                    grid: { color: 'rgba(255,255,255,0.06)' },
                 },
             },
         },

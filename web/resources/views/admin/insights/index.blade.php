@@ -136,8 +136,8 @@
                 tooltip: { callbacks: { label: ctx => ` R${ctx.raw.toLocaleString()}` } },
             },
             scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: v => 'R'+v.toLocaleString() } },
-                y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 11 } } },
+                x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#666', font: { size: 10 }, callback: v => 'R'+v.toLocaleString() } },
+                y: { grid: { display: false }, ticks: { color: '#999', font: { size: 11 } } },
             },
         },
     });
@@ -149,8 +149,8 @@
             labels: ['Surplus', 'Deficit', 'Break-even', 'No activity'],
             datasets: [{
                 data:             [{{ $surplus }}, {{ $deficit }}, {{ $breakeven }}, {{ $noActivity }}],
-                backgroundColor:  ['rgba(16,185,129,0.8)','rgba(239,68,68,0.8)','rgba(148,163,184,0.6)','rgba(226,232,240,0.8)'],
-                borderColor:      ['#10b981','#ef4444','#94a3b8','#e2e8f0'],
+                backgroundColor:  ['rgba(16,185,129,0.8)','rgba(239,68,68,0.8)','rgba(148,163,184,0.6)','rgba(80,80,80,0.6)'],
+                borderColor:      ['#10b981','#ef4444','#94a3b8','#555'],
                 borderWidth: 1.5,
             }],
         },
@@ -193,12 +193,12 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top', labels: { font: { size: 11 }, color: '#64748b', boxWidth: 12, padding: 16 } },
+                legend: { position: 'top', labels: { font: { size: 11 }, color: '#888', boxWidth: 12, padding: 16 } },
                 tooltip: { callbacks: { label: ctx => ` R${ctx.raw.toLocaleString()}` } },
             },
             scales: {
-                x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: v => 'R'+v.toLocaleString() } },
+                x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } },
+                y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#666', font: { size: 10 }, callback: v => 'R'+v.toLocaleString() } },
             },
         },
     });

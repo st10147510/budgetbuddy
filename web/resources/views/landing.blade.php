@@ -232,7 +232,7 @@
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;max-width:960px;margin:0 auto">
             @foreach([
                 ['Download the app',          'Get BudgetBuddy from the Play Store and create your free account with just an email address.'],
-                ['Sign into the web portal',  'Log in at budgetbuddy.app with the same account — no second registration needed.'],
+                ['Sign into the web portal',  'Log in at thebudgetbuddy.co.za with the same account — no second registration needed.'],
                 ['Upload your bank statement','Drag and drop any SA bank statement PDF. Every transaction is extracted and dated in seconds.'],
                 ['Set goals and budgets',     'Create monthly spending budgets per category and savings goals with target amounts to keep you on track.'],
                 ['Track debt payoff',         'Add your debts and choose a Snowball or Avalanche strategy — BudgetBuddy calculates your payoff date automatically.'],

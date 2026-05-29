@@ -45,6 +45,59 @@ class FirestoreService
     }
 
     /**
+     * Read a single document that lives at the root of the collection tree
+     * (not under a user document), e.g. "app_config/policies".
+     */
+    public function getGlobalDocument(string $collection, string $docId): array
+    {
+        try {
+            $url = "{$this->baseUrl}/{$collection}/{$docId}";
+            $response = $this->http->get($url, [
+                'headers' => ['Authorization' => "Bearer {$this->accessToken}"],
+            ]);
+            $body = json_decode($response->getBody(), true);
+            return $this->parseFields($body['fields'] ?? []);
+        } catch (Throwable) {
+            return [];
+        }
+    }
+
+    /**
+     * Upsert a root-level document (not under a user), e.g. "app_config/policies".
+     */
+    public function setGlobalDocument(string $collection, string $docId, array $data): void
+    {
+        try {
+            $url = "{$this->baseUrl}/{$collection}/{$docId}";
+            $this->http->patch($url, [
+                'headers' => [
+                    'Authorization' => "Bearer {$this->accessToken}",
+                    'Content-Type'  => 'application/json',
+                ],
+                'json' => ['fields' => $this->encodeFields($data)],
+            ]);
+        } catch (Throwable) {}
+    }
+
+    /**
+     * Read a single named document inside a user's sub-collection,
+     * e.g. getDocumentInCollection($uid, 'policy_acceptances', 'terms').
+     */
+    public function getDocumentInCollection(string $userId, string $collection, string $docId): array
+    {
+        try {
+            $url = "{$this->baseUrl}/users/{$userId}/{$collection}/{$docId}";
+            $response = $this->http->get($url, [
+                'headers' => ['Authorization' => "Bearer {$this->accessToken}"],
+            ]);
+            $body = json_decode($response->getBody(), true);
+            return $this->parseFields($body['fields'] ?? []);
+        } catch (Throwable) {
+            return [];
+        }
+    }
+
+    /**
      * Fetch one collection for each UID and return a flat array.
      * Each document gets a '_uid' key injected for grouping.
      * Silently skips users whose collection is empty or errors.
