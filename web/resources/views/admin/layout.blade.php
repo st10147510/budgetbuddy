@@ -19,11 +19,11 @@
 
         {{-- Logo --}}
         <div class="flex items-center gap-2 px-5 py-5 border-b border-white/[0.06]">
-            <div class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center">
-                <i class="bi bi-piggy-bank text-white text-sm"></i>
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:#6EDCD3">
+                <i class="bi bi-piggy-bank text-sm" style="color:#0D0D0D"></i>
             </div>
             <span class="font-semibold text-white tracking-tight">
-                Budget<span class="text-blue-400">Buddy</span>
+                Budget<span style="color:#6EDCD3">Buddy</span>
             </span>
             <span class="ml-auto text-[10px] font-medium text-slate-500 uppercase tracking-wider">Admin</span>
         </div>

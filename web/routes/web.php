@@ -11,8 +11,8 @@ use App\Http\Controllers\Portal\DashboardController as PortalDashboardController
 use App\Http\Controllers\Portal\UploadController;
 use Illuminate\Support\Facades\Route;
 
-// Root → portal login
-Route::get('/', fn () => redirect()->route('portal.login'));
+// Landing page
+Route::get('/', fn () => view('landing'))->name('landing');
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
