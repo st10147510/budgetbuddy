@@ -124,7 +124,7 @@
     <div class="container" style="text-align:center;position:relative;z-index:1">
         <div class="pill" style="margin-bottom:1.5rem">
             <span style="width:6px;height:6px;border-radius:50%;background:#6EDCD3;display:inline-block"></span>
-            Built for South Africa
+            Crafted in South Africa
         </div>
 
         <h1 style="font-size:clamp(2.5rem,6vw,4rem);font-weight:800;line-height:1.1;margin:0 auto 1.5rem;max-width:780px">
@@ -281,7 +281,7 @@
             </div>
             <span style="color:#fff;font-weight:600">Budget<span style="color:#6EDCD3">Buddy</span></span>
         </div>
-        <p style="margin:0">Built for South Africa &mdash; &copy; {{ date('Y') }} BudgetBuddy. All rights reserved.</p>
+        <p style="margin:0">Crafted in South Africa &mdash; &copy; {{ date('Y') }} BudgetBuddy. All rights reserved.</p>
     </div>
 </footer>
 
