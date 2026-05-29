@@ -18,6 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "com.budgetbuddy.HiltTestRunner"
+        buildConfigField("String", "API_BASE_URL", "\"https://thebudgetbuddy.co.za/api/\"")
     }
 
     signingConfigs {
@@ -43,6 +44,7 @@ android {
         }
         debug {
             enableUnitTestCoverage = true
+            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/\"")
         }
     }
 
@@ -115,6 +117,16 @@ dependencies {
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // Security
+    implementation(libs.androidx.security.crypto)
+
+    // Retrofit & OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)

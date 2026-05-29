@@ -27,7 +27,7 @@
         android:label="Sign In"
         tools:layout="@layout/fragment_sign_in">
         <action android:id="@+id/action_signIn_to_home"
-            app:destination="@id/homeFragment"
+            app:destination="@id/policyAcceptanceFragment"
             app:popUpTo="@id/welcomeFragment"
             app:popUpToInclusive="true" />
         <action android:id="@+id/action_signIn_to_signUp"
@@ -42,11 +42,22 @@
         android:label="Sign Up"
         tools:layout="@layout/fragment_sign_up">
         <action android:id="@+id/action_signUp_to_home"
-            app:destination="@id/homeFragment"
+            app:destination="@id/policyAcceptanceFragment"
             app:popUpTo="@id/welcomeFragment"
             app:popUpToInclusive="true" />
         <action android:id="@+id/action_signUp_to_signIn"
             app:destination="@id/signInFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/policyAcceptanceFragment"
+        android:name="com.budgetbuddy.ui.auth.PolicyAcceptanceFragment"
+        android:label="Policies"
+        tools:layout="@layout/fragment_policy_acceptance">
+        <action android:id="@+id/action_policyAcceptance_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/policyAcceptanceFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -70,7 +81,15 @@
             app:destination="@id/addExpenseFragment" />
         <action android:id="@+id/action_home_to_transactions"
             app:destination="@id/transactionListFragment" />
+        <action android:id="@+id/action_home_to_uploadStatement"
+            app:destination="@id/uploadStatementFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/uploadStatementFragment"
+        android:name="com.budgetbuddy.ui.statement.UploadStatementFragment"
+        android:label="Upload Statement"
+        tools:layout="@layout/fragment_upload_statement" />
 
     <fragment
         android:id="@+id/addExpenseFragment"

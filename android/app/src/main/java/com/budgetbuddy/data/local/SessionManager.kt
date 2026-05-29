@@ -1,6 +1,9 @@
 package com.budgetbuddy.data.local
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,7 +12,20 @@ import javax.inject.Singleton
 class SessionManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val prefs = context.getSharedPreferences("budget_buddy_session", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences by lazy { createEncryptedPrefs() }
+
+    private fun createEncryptedPrefs(): SharedPreferences {
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        return EncryptedSharedPreferences.create(
+            context,
+            "budget_buddy_session",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+        )
+    }
 
     var userId: String?
         get() = prefs.getString("userId", null)
@@ -31,7 +47,24 @@ class SessionManager @Inject constructor(
         set(value) = if (value != null) prefs.edit().putString("photoUrl", value).apply()
                      else prefs.edit().remove("photoUrl").apply()
 
+    var loginTimestamp: Long
+        get() = prefs.getLong("loginTimestamp", 0L)
+        set(value) = prefs.edit().putLong("loginTimestamp", value).apply()
+
     val isLoggedIn: Boolean get() = userId != null
 
+    fun isSessionExpired(): Boolean {
+        if (loginTimestamp == 0L) return false
+        return System.currentTimeMillis() - loginTimestamp > SESSION_DURATION_MS
+    }
+
+    fun extendSession() {
+        loginTimestamp = System.currentTimeMillis()
+    }
+
     fun clear() = prefs.edit().clear().apply()
+
+    companion object {
+        private const val SESSION_DURATION_MS = 60 * 60 * 1000L // 1 hour
+    }
 }

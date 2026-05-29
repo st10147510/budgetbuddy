@@ -42,6 +42,7 @@ class AuthRepository @Inject constructor(
             sessionManager.userId = user.uid
             sessionManager.displayName = displayName
             sessionManager.email = user.email ?: email
+            sessionManager.loginTimestamp = System.currentTimeMillis()
             CoroutineScope(Dispatchers.IO).launch {
                 syncRepository.syncToFirestore(user.uid)
                 syncRepository.syncFromFirestore(user.uid)
@@ -66,6 +67,7 @@ class AuthRepository @Inject constructor(
             sessionManager.userId = user.uid
             sessionManager.displayName = displayName.trim()
             sessionManager.email = user.email ?: email
+            sessionManager.loginTimestamp = System.currentTimeMillis()
             CoroutineScope(Dispatchers.IO).launch {
                 firestoreRepository.saveUserProfile(user.uid, displayName.trim(), user.email ?: email)
             }
