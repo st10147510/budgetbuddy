@@ -1,0 +1,145 @@
+name: Web — Build, Test, Docker & Release
+
+on:
+  push:
+    branches:
+      - main
+      - release
+    tags:
+      - 'v*.*.*'
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-build.yml'
+  pull_request:
+    paths:
+      - 'web/**'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/budgetbuddy-web
+
+jobs:
+  # ── PHP tests ───────────────────────────────────────────────────────────────
+  test:
+    name: PHP Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: sqlite3, pdo_sqlite, zip, mbstring
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: web/vendor
+          key: composer-${{ hashFiles('web/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Set up .env for testing
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Create dummy Firebase credentials
+        run: echo '{"type":"service_account","project_id":"test","private_key_id":"x","private_key":"","client_email":"test@test.iam.gserviceaccount.com","client_id":"1","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token"}' > firebase-service-account.json
+
+      - name: Run migrations (SQLite in-memory)
+        run: php artisan migrate --env=testing --force
+
+      - name: Run PHPUnit
+        run: php artisan test --parallel
+
+  # ── Docker build & push ─────────────────────────────────────────────────────
+  docker:
+    name: Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name != 'pull_request'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-,format=short
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: web
+          file: web/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── GitHub Release (on version tags only) ───────────────────────────────────
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    needs: docker
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## Docker image
+
+            ```
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ```
+
+            ### Quick start
+
+            ```bash
+            docker run -d \
+              -p 8080:80 \
+              -e APP_KEY=base64:... \
+              -e ADMIN_PASSWORD=secret \
+              -e FIREBASE_CREDENTIALS_JSON='...' \
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ```
