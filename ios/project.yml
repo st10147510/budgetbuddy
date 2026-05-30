@@ -1,0 +1,38 @@
+name: BudgetBuddy
+options:
+  bundleIdPrefix: co.za.thebudgetbuddy
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.4"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "10.29.0"
+
+targets:
+  BudgetBuddy:
+    type: application
+    platform: iOS
+    sources:
+      - path: BudgetBuddy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.za.thebudgetbuddy
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+        INFOPLIST_FILE: BudgetBuddy/App/Info.plist
+        DEVELOPMENT_ASSET_PATHS: BudgetBuddy/Preview\ Content
+        ENABLE_PREVIEWS: YES
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseStorage
+      - package: Firebase
+        product: FirebaseFunctions
