@@ -13,7 +13,7 @@ class PolicyService
 
     public function __construct()
     {
-        $this->firestore = new FirestoreService();
+        $this->firestore = app(FirestoreService::class);
     }
 
     public function getCurrentVersions(): array

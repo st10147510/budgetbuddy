@@ -38,7 +38,7 @@ class PolicyController extends Controller
      */
     public function current(): JsonResponse
     {
-        $service  = new PolicyService();
+        $service  = app(PolicyService::class);
         $versions = $service->getCurrentVersions();
         return response()->json(['data' => array_merge($versions, [
             'terms_content'   => $service->getContent('terms'),
@@ -69,7 +69,7 @@ class PolicyController extends Controller
         ]);
 
         $uid     = $request->firebase_uid;
-        $service = new PolicyService();
+        $service = app(PolicyService::class);
 
         if ($request->type === 'all') {
             $service->recordAllAcceptances($uid, 'android');
@@ -94,7 +94,7 @@ class PolicyController extends Controller
     public function status(Request $request): JsonResponse
     {
         $uid     = $request->firebase_uid;
-        $service = new PolicyService();
+        $service = app(PolicyService::class);
         $versions = $service->getCurrentVersions();
 
         return response()->json(['data' => [
