@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full font-sans antialiased" style="background:#0D0D0D">
+<body class="h-full font-sans antialiased">
 
 <div class="min-h-screen grid lg:grid-cols-2">
 

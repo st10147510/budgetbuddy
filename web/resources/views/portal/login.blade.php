@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        body { background: #0D0D0D; color: #fff; font-family: 'Inter', sans-serif; }
+        body { color: #fff; font-family: 'Inter', sans-serif; }
         .hero-panel {
             background: linear-gradient(135deg, #1A1A1A 0%, #0D0D0D 100%);
             border-right: 1px solid rgba(255,255,255,0.06);
@@ -88,7 +88,7 @@
     </div>
 
     {{-- ── Right — sign-in form ── --}}
-    <div class="flex items-center justify-center p-8 lg:p-16" style="background:#0D0D0D">
+    <div class="flex items-center justify-center p-8 lg:p-16">
         <div class="w-full max-w-sm">
 
             {{-- Mobile logo --}}
