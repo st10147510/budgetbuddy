@@ -4,6 +4,9 @@ use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\StatementController;
 use Illuminate\Support\Facades\Route;
 
+// ── API root — redirect browsers to the Swagger docs ─────────────────────────
+Route::get('v1', fn () => redirect('/api/v1/docs'));
+
 // ── Public endpoints (no Firebase token required) ─────────────────────────────
 Route::prefix('v1')->middleware(['api.cors', 'throttle:30,1'])->group(function () {
     Route::get('policies/current', [PolicyController::class, 'current']);

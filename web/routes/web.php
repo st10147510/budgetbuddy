@@ -20,7 +20,7 @@ Route::get('/terms',   [LegalController::class, 'terms'])->name('legal.terms');
 Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
 
 // ── API Documentation (Swagger UI) ────────────────────────────────────────────
-Route::get('/docs', fn () => view('api.docs'))->name('api.docs');
+Route::get('/api/v1/docs', fn () => view('api.docs'))->name('api.docs');
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
