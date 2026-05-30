@@ -106,6 +106,13 @@
     <string name="all_transactions">Alle Transaktionen</string>
     <string name="debt_management">Schuldenmanagement</string>
     <string name="no_debts">Keine Schulden.\nTippen Sie auf +, um welche hinzuzufügen.</string>
+    <string name="no_transactions_sub">Tippen Sie auf + um die erste Transaktion zu erfassen</string>
+    <string name="no_budgets_title">Keine Budgets festgelegt</string>
+    <string name="no_budgets_sub">Tippen Sie auf + zum Hinzufügen</string>
+    <string name="no_goals_title">Keine Ziele</string>
+    <string name="no_goals_sub">Tippen Sie auf + zum Hinzufügen</string>
+    <string name="no_debts_title">Keine Schulden</string>
+    <string name="no_debts_sub">Tippen Sie auf + zum Hinzufügen</string>
     <string name="categories">Kategorien</string>
     <string name="edit">Bearbeiten</string>
     <string name="delete">Löschen</string>

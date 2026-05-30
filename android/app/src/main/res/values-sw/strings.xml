@@ -106,6 +106,13 @@
     <string name="all_transactions">Miamala yote</string>
     <string name="debt_management">Usimamizi wa madeni</string>
     <string name="no_debts">Hakuna madeni.\nGonga + kuongeza.</string>
+    <string name="no_transactions_sub">Gonga + kurekodi muamala wako wa kwanza</string>
+    <string name="no_budgets_title">Hakuna bajeti</string>
+    <string name="no_budgets_sub">Gonga + kuongeza</string>
+    <string name="no_goals_title">Hakuna malengo</string>
+    <string name="no_goals_sub">Gonga + kuongeza</string>
+    <string name="no_debts_title">Hakuna madeni</string>
+    <string name="no_debts_sub">Gonga + kuongeza</string>
     <string name="categories">Kategoria</string>
     <string name="edit">Hariri</string>
     <string name="delete">Futa</string>

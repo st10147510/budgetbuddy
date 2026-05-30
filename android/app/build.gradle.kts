@@ -68,6 +68,11 @@ android {
             isReturnDefaultValues = true
         }
     }
+
+    lint {
+        disable += "MissingTranslation"
+        abortOnError = true
+    }
 }
 
 dependencies {

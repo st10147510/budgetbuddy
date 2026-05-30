@@ -113,6 +113,13 @@
     <string name="all_transactions">Toutes les transactions</string>
     <string name="debt_management">Gestion des dettes</string>
     <string name="no_debts">Aucune dette ajoutée.\nAppuyez sur + pour en ajouter une.</string>
+    <string name="no_transactions_sub">Appuyez sur + pour enregistrer votre première transaction</string>
+    <string name="no_budgets_title">Aucun budget défini</string>
+    <string name="no_budgets_sub">Appuyez sur + pour en ajouter un</string>
+    <string name="no_goals_title">Aucun objectif</string>
+    <string name="no_goals_sub">Appuyez sur + pour en ajouter un</string>
+    <string name="no_debts_title">Aucune dette ajoutée</string>
+    <string name="no_debts_sub">Appuyez sur + pour en ajouter une</string>
     <string name="categories">Catégories</string>
     <string name="edit">Modifier</string>
     <string name="delete">Supprimer</string>

@@ -107,6 +107,13 @@
     <string name="all_transactions">Todas las transacciones</string>
     <string name="debt_management">Gestión de deudas</string>
     <string name="no_debts">Sin deudas.\nToca + para agregar una.</string>
+    <string name="no_transactions_sub">Toca + para registrar tu primera transacción</string>
+    <string name="no_budgets_title">Sin presupuestos</string>
+    <string name="no_budgets_sub">Toca + para agregar uno</string>
+    <string name="no_goals_title">Sin metas</string>
+    <string name="no_goals_sub">Toca + para agregar una</string>
+    <string name="no_debts_title">Sin deudas</string>
+    <string name="no_debts_sub">Toca + para agregar una</string>
     <string name="categories">Categorías</string>
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>

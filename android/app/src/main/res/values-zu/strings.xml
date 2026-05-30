@@ -106,6 +106,13 @@
     <string name="all_transactions">Zonke izinhlelo zemali</string>
     <string name="debt_management">Ukuphatha izikweletu</string>
     <string name="no_debts">Azikho izikweletu.\nCindezela + ukwengeza.</string>
+    <string name="no_transactions_sub">Cindezela + ukwengeza</string>
+    <string name="no_budgets_title">Azikho izabelomali</string>
+    <string name="no_budgets_sub">Cindezela + ukwengeza</string>
+    <string name="no_goals_title">Azikho izinhloso</string>
+    <string name="no_goals_sub">Cindezela + ukwengeza</string>
+    <string name="no_debts_title">Azikho izikweletu</string>
+    <string name="no_debts_sub">Cindezela + ukwengeza</string>
     <string name="categories">Izigaba</string>
     <string name="edit">Hlela</string>
     <string name="delete">Susa</string>

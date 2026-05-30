@@ -117,6 +117,13 @@
     <string name="all_transactions">Alle transaksies</string>
     <string name="debt_management">Skuldbeheer</string>
     <string name="no_debts">Geen skulde bygevoeg nie.\nTik + om een by te voeg.</string>
+    <string name="no_transactions_sub">Tik + om jou eerste transaksie op te teken</string>
+    <string name="no_budgets_title">Geen begrotings gestel</string>
+    <string name="no_budgets_sub">Tik + om een by te voeg</string>
+    <string name="no_goals_title">Geen doelwitte</string>
+    <string name="no_goals_sub">Tik + om een by te voeg</string>
+    <string name="no_debts_title">Geen skulde bygevoeg</string>
+    <string name="no_debts_sub">Tik + om een by te voeg</string>
     <string name="categories">Kategorieë</string>
     <string name="edit">Wysig</string>
     <string name="delete">Verwyder</string>

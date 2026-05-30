@@ -106,6 +106,13 @@
     <string name="all_transactions">Alle transacties</string>
     <string name="debt_management">Schuldbeheer</string>
     <string name="no_debts">Geen schulden.\nTik op + om er een toe te voegen.</string>
+    <string name="no_transactions_sub">Tik op + om uw eerste transactie vast te leggen</string>
+    <string name="no_budgets_title">Geen budgetten</string>
+    <string name="no_budgets_sub">Tik op + om er een toe te voegen</string>
+    <string name="no_goals_title">Geen doelen</string>
+    <string name="no_goals_sub">Tik op + om er een toe te voegen</string>
+    <string name="no_debts_title">Geen schulden</string>
+    <string name="no_debts_sub">Tik op + om er een toe te voegen</string>
     <string name="categories">Categorieën</string>
     <string name="edit">Bewerken</string>
     <string name="delete">Verwijderen</string>
