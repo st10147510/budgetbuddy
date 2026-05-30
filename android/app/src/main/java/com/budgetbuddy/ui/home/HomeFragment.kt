@@ -59,6 +59,10 @@ class HomeFragment : Fragment() {
         binding.tvSeeAll.setOnClickListener { findNavController().navigate(R.id.transactionListFragment) }
         binding.tvGoalsViewAll.setOnClickListener { findNavController().navigate(R.id.goalsFragment) }
 
+        binding.emptyState.tvEmptyTitle.setText(R.string.no_transactions)
+        binding.emptyState.tvEmptySubtitle.setText(R.string.no_transactions_sub)
+        binding.emptyState.tvEmptySubtitle.visibility = View.VISIBLE
+
         val userId = session.userId ?: return
         viewModel.init(userId)
 
@@ -78,8 +82,8 @@ class HomeFragment : Fragment() {
                     binding.tvMonthExpense.text  = "↓ ${CurrencyFormatter.format(ctx, state.totalSpendThisMonth)}"
                     binding.tvAllTimeBalance.text = CurrencyFormatter.format(ctx, state.allTimeBalance)
                     adapter.submitList(items)
-                    binding.tvEmptyState.visibility =
-                        if (state.recentTransactions.isEmpty()) View.VISIBLE else View.GONE
+                    binding.rvTransactions.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+                    binding.emptyState.root.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }

@@ -32,6 +32,13 @@
     <string name="view_all">View All</string>
     <string name="add_new">Add New</string>
     <string name="no_transactions">No transactions yet</string>
+    <string name="no_transactions_sub">Tap + to record your first transaction</string>
+    <string name="no_budgets_title">No budgets set</string>
+    <string name="no_budgets_sub">Tap + to create a budget</string>
+    <string name="no_goals_title">No savings goals</string>
+    <string name="no_goals_sub">Tap + to set your first goal</string>
+    <string name="no_debts_title">No debts tracked</string>
+    <string name="no_debts_sub">Tap + to add a debt</string>
 
     <!-- Expenses -->
     <string name="add_expense">Add Expense</string>

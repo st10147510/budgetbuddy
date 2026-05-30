@@ -59,12 +59,16 @@ class GoalsFragment : Fragment() {
         binding.fabAddGoal.setOnClickListener { showAddGoalDialog(userId) }
         binding.btnDebt.setOnClickListener { findNavController().navigate(R.id.debtFragment) }
 
+        binding.emptyState.tvEmptyTitle.setText(R.string.no_goals_title)
+        binding.emptyState.tvEmptySubtitle.setText(R.string.no_goals_sub)
+        binding.emptyState.tvEmptySubtitle.visibility = View.VISIBLE
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.goals.collect { goals ->
                     adapter.submitList(goals)
-                    binding.tvEmptyState.visibility = if (goals.isEmpty()) View.VISIBLE else View.GONE
                     binding.rvGoals.visibility = if (goals.isEmpty()) View.GONE else View.VISIBLE
+                    binding.emptyState.root.visibility = if (goals.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }

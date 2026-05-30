@@ -64,12 +64,16 @@ class DebtFragment : Fragment() {
             findNavController().navigate(R.id.action_debt_to_paymentPlan)
         }
 
+        binding.emptyState.tvEmptyTitle.setText(R.string.no_debts_title)
+        binding.emptyState.tvEmptySubtitle.setText(R.string.no_debts_sub)
+        binding.emptyState.tvEmptySubtitle.visibility = View.VISIBLE
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.debts.collect { debts ->
                     adapter.submitList(debts)
-                    binding.tvEmptyState.visibility = if (debts.isEmpty()) View.VISIBLE else View.GONE
                     binding.rvDebts.visibility = if (debts.isEmpty()) View.GONE else View.VISIBLE
+                    binding.emptyState.root.visibility = if (debts.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }

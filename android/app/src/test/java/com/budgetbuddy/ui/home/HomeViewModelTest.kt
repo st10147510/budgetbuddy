@@ -40,6 +40,9 @@ class HomeViewModelTest {
         goalRepository = mock()
         whenever(categoryRepository.getAllCategories()).thenReturn(flowOf(emptyList()))
         whenever(goalRepository.getActiveGoals(any())).thenReturn(flowOf(emptyList()))
+        whenever(transactionRepository.getAllTransactions(any())).thenReturn(flowOf(emptyList()))
+        whenever(transactionRepository.getRecentTransactions(any(), any())).thenReturn(flowOf(emptyList()))
+        whenever(transactionRepository.getTransactionsByDateRange(any(), any(), any())).thenReturn(flowOf(emptyList()))
         viewModel = HomeViewModel(transactionRepository, categoryRepository, budgetRepository, goalRepository)
     }
 

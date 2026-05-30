@@ -50,6 +50,10 @@ class TransactionListFragment : Fragment() {
         val userId = session.userId ?: return
         viewModel.loadAllTransactions(userId)
 
+        binding.emptyState.tvEmptyTitle.setText(R.string.no_transactions)
+        binding.emptyState.tvEmptySubtitle.setText(R.string.no_transactions_sub)
+        binding.emptyState.tvEmptySubtitle.visibility = View.VISIBLE
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 combine(
@@ -63,6 +67,8 @@ class TransactionListFragment : Fragment() {
                     }
                 }.collect { items ->
                     adapter.submitList(items)
+                    binding.rvTransactions.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+                    binding.emptyState.root.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }

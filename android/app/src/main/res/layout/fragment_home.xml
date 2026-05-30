@@ -310,14 +310,11 @@
                 android:paddingHorizontal="20dp"
                 android:nestedScrollingEnabled="false"/>
 
-            <TextView
-                android:id="@+id/tvEmptyState"
+            <include
+                android:id="@+id/emptyState"
+                layout="@layout/layout_empty_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_transactions"
-                android:textColor="@color/text_secondary_dark"
-                android:gravity="center"
-                android:padding="40dp"
                 android:visibility="gone"/>
 
         </LinearLayout>

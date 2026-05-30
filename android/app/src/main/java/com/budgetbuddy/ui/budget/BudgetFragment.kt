@@ -63,12 +63,16 @@ class BudgetFragment : Fragment() {
 
         binding.fabAddBudget.setOnClickListener { showAddBudgetDialog(userId) }
 
+        binding.emptyState.tvEmptyTitle.setText(R.string.no_budgets_title)
+        binding.emptyState.tvEmptySubtitle.setText(R.string.no_budgets_sub)
+        binding.emptyState.tvEmptySubtitle.visibility = View.VISIBLE
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.budgetsWithSpend.collect { budgets ->
                     adapter.submitList(budgets)
-                    binding.tvEmptyState.visibility = if (budgets.isEmpty()) View.VISIBLE else View.GONE
                     binding.rvBudgets.visibility = if (budgets.isEmpty()) View.GONE else View.VISIBLE
+                    binding.emptyState.root.visibility = if (budgets.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }
