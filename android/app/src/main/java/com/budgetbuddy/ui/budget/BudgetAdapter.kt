@@ -35,18 +35,19 @@ class BudgetAdapter(
             binding.tvPercent.text = "${item.progressPercent}%"
             binding.progressBudget.progress = item.progressPercent.coerceIn(0, 100)
 
-            val (statusColor, chipLabel) = when (item.status) {
-                BudgetStatus.OK       -> ContextCompat.getColor(ctx, R.color.green_ok)   to "On Track"
-                BudgetStatus.WARNING  -> ContextCompat.getColor(ctx, R.color.amber_warning) to "Near Limit"
-                BudgetStatus.EXCEEDED -> ContextCompat.getColor(ctx, R.color.red_danger)  to "Over Limit"
-                BudgetStatus.UNDER_MIN -> ContextCompat.getColor(ctx, R.color.blue_info)  to "Below Goal"
+            val (statusColorRes, chipColorRes, chipLabel) = when (item.status) {
+                BudgetStatus.OK        -> Triple(R.color.green_ok,      R.color.chip_ok,      "On Track")
+                BudgetStatus.WARNING   -> Triple(R.color.amber_warning, R.color.chip_warning, "Near Limit")
+                BudgetStatus.EXCEEDED  -> Triple(R.color.red_danger,    R.color.chip_danger,  "Over Limit")
+                BudgetStatus.UNDER_MIN -> Triple(R.color.blue_info,     R.color.chip_info,    "Below Goal")
             }
 
+            val statusColor = ContextCompat.getColor(ctx, statusColorRes)
             binding.tvPercent.setTextColor(statusColor)
             binding.progressBudget.progressTintList = android.content.res.ColorStateList.valueOf(statusColor)
 
             binding.tvComplianceChip.text = chipLabel
-            binding.tvComplianceChip.background.setTint(statusColor)
+            binding.tvComplianceChip.background.setTint(ContextCompat.getColor(ctx, chipColorRes))
 
             if (item.budget.minAmount > 0) {
                 binding.tvMinGoal.visibility = View.VISIBLE

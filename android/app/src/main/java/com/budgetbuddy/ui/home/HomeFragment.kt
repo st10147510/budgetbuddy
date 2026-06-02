@@ -56,6 +56,7 @@ class HomeFragment : Fragment() {
         binding.tvMonth.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(Date())
 
         binding.btnAddExpense.setOnClickListener { findNavController().navigate(R.id.addExpenseFragment) }
+        binding.btnUploadStatement.setOnClickListener { findNavController().navigate(R.id.action_home_to_uploadStatement) }
         binding.tvSeeAll.setOnClickListener { findNavController().navigate(R.id.transactionListFragment) }
         binding.tvGoalsViewAll.setOnClickListener { findNavController().navigate(R.id.goalsFragment) }
 

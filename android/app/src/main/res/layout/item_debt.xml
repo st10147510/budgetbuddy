@@ -71,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_delete"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete debt"
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
 

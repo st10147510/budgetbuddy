@@ -44,6 +44,7 @@
                 android:layout_height="wrap_content"
                 app:fabSize="mini"
                 android:src="@drawable/ic_add"
+                android:contentDescription="Add debt"
                 app:backgroundTint="@color/teal_accent"
                 app:tint="@color/background"/>
         </LinearLayout>

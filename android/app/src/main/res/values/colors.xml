@@ -37,11 +37,17 @@
     <color name="cat_savings">#8BC34A</color>
     <color name="cat_other">#607D8B</color>
 
+    <!-- Chip status backgrounds (darker variants for WCAG AA white text contrast) -->
+    <color name="chip_ok">#1B5E20</color>
+    <color name="chip_warning">#BF360C</color>
+    <color name="chip_danger">#B71C1C</color>
+    <color name="chip_info">#0D47A1</color>
+
     <!-- Semantic aliases -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_primary_dark">#1A1A1A</color>
     <color name="text_secondary">#999999</color>
-    <color name="text_secondary_dark">#888888</color>
+    <color name="text_secondary_dark">#666666</color>
     <color name="expense_red">#F44336</color>
     <color name="income_green">#4CAF50</color>
 
