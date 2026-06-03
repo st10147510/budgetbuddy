@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* BudgetBuddy mobile palette */
+    --color-bb-bg:       #0D0D0D;
+    --color-bb-surface:  #1A1A1A;
+    --color-bb-surface2: #2A2A2A;
+    --color-bb-teal:     #6EDCD3;
+    --color-bb-teal-dim: #4BBDB5;
+    --color-bb-coral:    #E8847A;
+    --color-bb-cream:    #F5D5A8;
+    --color-bb-text:     #FFFFFF;
+    --color-bb-muted:    #999999;
+    --color-bb-income:   #4CAF50;
+    --color-bb-expense:  #F44336;
+}
+
+/* ── Admin sidebar nav active (teal accent) ── */
+.nav-active {
+    background: rgba(110,220,211,0.12);
+    color: #6EDCD3;
+    border-left: 3px solid #6EDCD3;
+    padding-left: calc(0.75rem - 3px);
+}
+
+/* ── Portal / dark-theme card ── */
+.bb-card {
+    background: #1A1A1A;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 1rem;
+}
+
+/* ── Drag-drop highlight ── */
+.drop-active {
+    border-color: #6EDCD3 !important;
+    background-color: rgba(110,220,211,0.06) !important;
+}
+
+/* ── Queue job bar animation ── */
+@keyframes slide {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(500%); }
+}
+.bar-slide { animation: slide 1.5s ease-in-out infinite; }
+
+/* ── Teal focus rings for dark inputs ── */
+.bb-input {
+    background: #2A2A2A;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.bb-input::placeholder { color: #666; }
+.bb-input:focus { border-color: #6EDCD3; box-shadow: 0 0 0 3px rgba(110,220,211,0.15); }
+
+/* ── Teal button ── */
+.bb-btn {
+    background: #6EDCD3;
+    color: #0D0D0D;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1.25rem;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+.bb-btn:hover { background: #4BBDB5; }

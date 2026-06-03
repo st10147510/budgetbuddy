@@ -1,0 +1,416 @@
+openapi: 3.0.3
+
+info:
+  title: BudgetBuddy API
+  version: 1.0.0
+  description: |
+    REST API for the BudgetBuddy personal finance mobile app.
+
+    ## Authentication
+    Most endpoints require a valid **Firebase ID token** passed as a Bearer token
+    in the `Authorization` header. Tokens are obtained from Firebase Auth on the
+    Android client and expire after 1 hour.
+
+    ```
+    Authorization: Bearer <Firebase ID Token>
+    ```
+
+    To obtain a token on Android:
+    ```kotlin
+    FirebaseAuth.getInstance().currentUser
+        ?.getIdToken(false)?.await()?.token
+    ```
+
+    ## Rate Limits
+    | Scope | Limit |
+    |---|---|
+    | Public endpoints | 30 req / min (by IP) |
+    | Authenticated endpoints | 120 req / min (by Firebase UID) |
+    | Statement upload | 10 req / min (by Firebase UID) |
+
+    ## AI Assistance
+    Security hardening, Firebase rules configuration, and this API documentation
+    were generated with AI assistance (Claude by Anthropic).
+
+  contact:
+    name: BudgetBuddy Support
+    email: noreply@thebudgetbuddy.co.za
+
+servers:
+  - url: https://thebudgetbuddy.co.za/api/v1
+    description: Production
+  - url: http://localhost:8000/api/v1
+    description: Local development
+  - url: http://10.0.2.2:8000/api/v1
+    description: Android emulator
+
+tags:
+  - name: Policies
+    description: Versioned Terms & Conditions and Privacy Policy management
+  - name: Statements
+    description: Bank statement PDF upload and async processing queue
+
+components:
+  securitySchemes:
+    FirebaseToken:
+      type: http
+      scheme: bearer
+      bearerFormat: Firebase ID Token
+
+  schemas:
+
+    PolicyVersions:
+      type: object
+      description: Current required version for each policy document
+      properties:
+        terms:
+          type: string
+          example: "1.0"
+        privacy:
+          type: string
+          example: "1.0"
+
+    PolicyStatus:
+      type: object
+      properties:
+        terms_accepted:
+          type: boolean
+          description: Whether the user has accepted the current Terms & Conditions version
+        privacy_accepted:
+          type: boolean
+          description: Whether the user has accepted the current Privacy Policy version
+        all_accepted:
+          type: boolean
+          description: True when both policies are accepted at their current versions
+        current_versions:
+          $ref: '#/components/schemas/PolicyVersions'
+
+    AcceptPolicyRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [terms, privacy, all]
+          description: |
+            Which policy to accept. Use `all` to accept both Terms and Privacy
+            Policy in a single request (recommended on first launch).
+          example: all
+
+    StatementJobSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 42
+        filename:
+          type: string
+          example: FNB_Statement_May2026.pdf
+        status:
+          type: string
+          enum: [pending, processing, done, failed]
+          example: pending
+        rows_imported:
+          type: integer
+          nullable: true
+          description: Number of transactions successfully imported (null until done)
+          example: null
+        error:
+          type: string
+          nullable: true
+          description: Error message if processing failed
+          example: null
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-05-29T10:00:00.000000Z"
+
+    StatementJobDetail:
+      allOf:
+        - $ref: '#/components/schemas/StatementJobSummary'
+        - type: object
+          properties:
+            storage_url:
+              type: string
+              nullable: true
+              description: Firebase Storage URL of the uploaded PDF (may be null)
+              example: null
+
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Acceptance recorded.
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: The type field is required.
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Unauthorized.
+
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: No query results for model.
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid Firebase ID token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+
+    ValidationFailed:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+
+    NotFound:
+      description: Resource not found or belongs to a different user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+
+paths:
+
+  # ── Policies ──────────────────────────────────────────────────────────────────
+
+  /policies/current:
+    get:
+      operationId: getPolicyVersions
+      summary: Get current policy versions
+      description: |
+        Returns the current required version for each policy document.
+        **No authentication required** — the Android app calls this before login
+        to determine which version the user must accept.
+      tags: [Policies]
+      security: []
+      responses:
+        '200':
+          description: Current policy versions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PolicyVersions'
+              example:
+                data:
+                  terms: "1.0"
+                  privacy: "1.0"
+
+  /policies/accept:
+    post:
+      operationId: acceptPolicy
+      summary: Record policy acceptance
+      description: |
+        Records that the authenticated user has accepted the specified policy at
+        its current version. Use `type: "all"` to accept both documents in one
+        request (recommended on first launch).
+      tags: [Policies]
+      security:
+        - FirebaseToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptPolicyRequest'
+            example:
+              type: all
+      responses:
+        '200':
+          description: Acceptance recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /policies/status:
+    get:
+      operationId: getPolicyStatus
+      summary: Get per-user policy acceptance status
+      description: |
+        Returns whether the authenticated user has accepted each policy at its
+        current version. The Android app polls this after login to decide whether
+        to show the `PolicyAcceptanceFragment`.
+      tags: [Policies]
+      security:
+        - FirebaseToken: []
+      responses:
+        '200':
+          description: Policy acceptance status for the current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PolicyStatus'
+              example:
+                data:
+                  terms_accepted: true
+                  privacy_accepted: false
+                  all_accepted: false
+                  current_versions:
+                    terms: "1.0"
+                    privacy: "1.0"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── Statements ────────────────────────────────────────────────────────────────
+
+  /statements:
+    get:
+      operationId: listStatements
+      summary: List statement upload jobs
+      description: |
+        Returns the 20 most recent bank statement upload jobs for the authenticated
+        user, newest first. Poll this or `GET /statements/{id}` to track progress.
+      tags: [Statements]
+      security:
+        - FirebaseToken: []
+      responses:
+        '200':
+          description: List of upload jobs (max 20, newest first)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StatementJobSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: uploadStatement
+      summary: Upload a PDF bank statement
+      description: |
+        Uploads a PDF bank statement and queues it for asynchronous processing.
+
+        The response is **202 Accepted** — poll `GET /statements/{id}` to track
+        progress. Status lifecycle: `pending` → `processing` → `done` | `failed`.
+
+        **Constraints:**
+        - File type: PDF only (`application/pdf`)
+        - Max size: 10 MB
+        - Rate limit: 10 uploads per minute per user
+      tags: [Statements]
+      security:
+        - FirebaseToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF bank statement (max 10 MB)
+                default_category:
+                  type: integer
+                  description: Optional category ID to assign to imported transactions
+      responses:
+        '202':
+          description: Statement accepted and queued for processing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Statement uploaded and queued for processing.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 42
+                      filename:
+                        type: string
+                        example: FNB_Statement_May2026.pdf
+                      status:
+                        type: string
+                        example: pending
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /statements/{id}:
+    get:
+      operationId: getStatement
+      summary: Get a single statement job
+      description: |
+        Returns the full details of a single upload job. Poll this endpoint to
+        track processing status. A 404 is returned if the job does not belong
+        to the authenticated user.
+
+        **Status lifecycle:** `pending` → `processing` → `done` | `failed`
+      tags: [Statements]
+      security:
+        - FirebaseToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Statement job ID returned from the upload endpoint
+          schema:
+            type: integer
+          example: 42
+      responses:
+        '200':
+          description: Job details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StatementJobDetail'
+              example:
+                data:
+                  id: 42
+                  filename: FNB_Statement_May2026.pdf
+                  status: done
+                  rows_imported: 37
+                  storage_url: null
+                  error: null
+                  created_at: "2026-05-29T10:00:00.000000Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'

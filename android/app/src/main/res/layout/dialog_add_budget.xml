@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet_dark"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="32dp">
+
+    <!-- Handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:background="#44FFFFFF"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set Budget"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Category dropdown -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        app:boxBackgroundColor="@color/surface"
+        app:boxStrokeColor="@color/teal_accent"
+        app:hintTextColor="@color/text_secondary"
+        android:layout_marginBottom="16dp">
+        <AutoCompleteTextView
+            android:id="@+id/actvCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="@color/white"
+            android:textColorHint="@color/text_secondary"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Minimum spending goal (optional) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilMinAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Minimum spending goal (optional)"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundColor="@color/surface"
+        app:boxStrokeColor="@color/blue_info"
+        app:hintTextColor="@color/text_secondary"
+        app:prefixText="R "
+        app:prefixTextColor="@color/text_secondary"
+        app:helperText="Alert when you spend below this amount"
+        app:helperTextTextColor="@color/text_secondary"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etMinAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textColor="@color/white"
+            android:textColorHint="@color/text_secondary"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Budget limit -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Budget limit"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundColor="@color/surface"
+        app:boxStrokeColor="@color/teal_accent"
+        app:hintTextColor="@color/text_secondary"
+        app:prefixText="R "
+        app:prefixTextColor="@color/text_secondary"
+        android:layout_marginBottom="28dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textColor="@color/white"
+            android:textColorHint="@color/text_secondary"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Save Budget"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/background"
+        app:backgroundTint="@color/cream_accent"
+        app:cornerRadius="28dp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Cancel"
+        android:textColor="@color/text_secondary"
+        style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+</LinearLayout>

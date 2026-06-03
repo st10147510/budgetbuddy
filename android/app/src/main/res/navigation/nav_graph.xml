@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/welcomeFragment">
+
+    <!-- ===== AUTH FLOW ===== -->
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.budgetbuddy.ui.auth.WelcomeFragment"
+        android:label="Welcome"
+        tools:layout="@layout/fragment_welcome">
+        <action android:id="@+id/action_welcome_to_signIn"
+            app:destination="@id/signInFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action android:id="@+id/action_welcome_to_signUp"
+            app:destination="@id/signUpFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.budgetbuddy.ui.auth.SignInFragment"
+        android:label="Sign In"
+        tools:layout="@layout/fragment_sign_in">
+        <action android:id="@+id/action_signIn_to_home"
+            app:destination="@id/policyAcceptanceFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+        <action android:id="@+id/action_signIn_to_signUp"
+            app:destination="@id/signUpFragment" />
+        <action android:id="@+id/action_signIn_to_forgotPassword"
+            app:destination="@id/forgotPasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.budgetbuddy.ui.auth.SignUpFragment"
+        android:label="Sign Up"
+        tools:layout="@layout/fragment_sign_up">
+        <action android:id="@+id/action_signUp_to_home"
+            app:destination="@id/policyAcceptanceFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+        <action android:id="@+id/action_signUp_to_signIn"
+            app:destination="@id/signInFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/policyAcceptanceFragment"
+        android:name="com.budgetbuddy.ui.auth.PolicyAcceptanceFragment"
+        android:label="Policies"
+        tools:layout="@layout/fragment_policy_acceptance">
+        <action android:id="@+id/action_policyAcceptance_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/policyAcceptanceFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.budgetbuddy.ui.auth.ForgotPasswordFragment"
+        android:label="Forgot Password"
+        tools:layout="@layout/fragment_forgot_password">
+        <action android:id="@+id/action_forgotPassword_to_signIn"
+            app:destination="@id/signInFragment"
+            app:popUpTo="@id/signInFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- ===== MAIN APP FLOW ===== -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.budgetbuddy.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action android:id="@+id/action_home_to_addExpense"
+            app:destination="@id/addExpenseFragment" />
+        <action android:id="@+id/action_home_to_transactions"
+            app:destination="@id/transactionListFragment" />
+        <action android:id="@+id/action_home_to_uploadStatement"
+            app:destination="@id/uploadStatementFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/uploadStatementFragment"
+        android:name="com.budgetbuddy.ui.statement.UploadStatementFragment"
+        android:label="Upload Statement"
+        tools:layout="@layout/fragment_upload_statement" />
+
+    <fragment
+        android:id="@+id/addExpenseFragment"
+        android:name="com.budgetbuddy.ui.expense.AddExpenseFragment"
+        android:label="Add Expense"
+        tools:layout="@layout/fragment_add_expense">
+        <argument android:name="transactionId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/transactionListFragment"
+        android:name="com.budgetbuddy.ui.expense.TransactionListFragment"
+        android:label="Transactions"
+        tools:layout="@layout/fragment_transaction_list">
+        <action android:id="@+id/action_transactions_to_editExpense"
+            app:destination="@id/addExpenseFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/transactionDetailFragment"
+        android:name="com.budgetbuddy.ui.expense.TransactionDetailFragment"
+        android:label="Transaction"
+        tools:layout="@layout/fragment_transaction_detail">
+        <argument android:name="transactionId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/goalDetailFragment"
+        android:name="com.budgetbuddy.ui.goals.GoalDetailFragment"
+        android:label="Goal Details"
+        tools:layout="@layout/fragment_goal_detail">
+        <argument android:name="goalId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/debtDetailFragment"
+        android:name="com.budgetbuddy.ui.debt.DebtDetailFragment"
+        android:label="Debt Details"
+        tools:layout="@layout/fragment_debt_detail">
+        <argument android:name="debtId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/budgetDetailFragment"
+        android:name="com.budgetbuddy.ui.budget.BudgetDetailFragment"
+        android:label="Budget Details"
+        tools:layout="@layout/fragment_budget_detail">
+        <argument android:name="budgetId" app:argType="long" android:defaultValue="-1L" />
+        <argument android:name="spent" app:argType="float" android:defaultValue="0.0" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/budgetFragment"
+        android:name="com.budgetbuddy.ui.budget.BudgetFragment"
+        android:label="Budget"
+        tools:layout="@layout/fragment_budget" />
+
+    <fragment
+        android:id="@+id/reportsFragment"
+        android:name="com.budgetbuddy.ui.reports.ReportsFragment"
+        android:label="Reports"
+        tools:layout="@layout/fragment_reports" />
+
+    <fragment
+        android:id="@+id/goalsFragment"
+        android:name="com.budgetbuddy.ui.goals.GoalsFragment"
+        android:label="Goals"
+        tools:layout="@layout/fragment_goals">
+        <action android:id="@+id/action_goals_to_debt"
+            app:destination="@id/debtFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/debtFragment"
+        android:name="com.budgetbuddy.ui.debt.DebtFragment"
+        android:label="Debt"
+        tools:layout="@layout/fragment_debt">
+        <action android:id="@+id/action_debt_to_paymentPlan"
+            app:destination="@id/paymentPlanFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/paymentPlanFragment"
+        android:name="com.budgetbuddy.ui.debt.PaymentPlanFragment"
+        android:label="Payment Plan"
+        tools:layout="@layout/fragment_payment_plan"/>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.budgetbuddy.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+        <action android:id="@+id/action_profile_to_welcome"
+            app:destination="@id/welcomeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        <action android:id="@+id/action_profile_to_badges"
+            app:destination="@id/badgesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/badgesFragment"
+        android:name="com.budgetbuddy.ui.gamification.BadgesFragment"
+        android:label="Badges"
+        tools:layout="@layout/fragment_badges" />
+
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.budgetbuddy.ui.category.CategoriesFragment"
+        android:label="Categories"
+        tools:layout="@layout/fragment_categories" />
+
+</navigation>
