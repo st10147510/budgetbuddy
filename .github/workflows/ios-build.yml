@@ -295,11 +295,11 @@ jobs:
       #       -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
 
       # - name: Upload IPA
-        if: ${{ secrets.IOS_CERTIFICATE_BASE64 != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.date_today }}-${{ env.repository_name }}-release.ipa
-          path: ${{ runner.temp }}/IPA/*.ipa
+        # if: ${{ secrets.IOS_CERTIFICATE_BASE64 != '' }}
+        # uses: actions/upload-artifact@v4
+        # with:
+        #   name: ${{ env.date_today }}-${{ env.repository_name }}-release.ipa
+        #   path: ${{ runner.temp }}/IPA/*.ipa
 
   # ── GitHub Release (on version tags only) ────────────────────────────────────
   release:
