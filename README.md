@@ -4,7 +4,7 @@ A personal finance platform for tracking expenses, managing budgets, monitoring 
 
 ## AI Assistance
 
-Several parts of this project were built with AI assistance (Claude by Anthropic):
+Several parts of this project were researched and assisted by AI assistance (Claude by Anthropic):
 
 | Area | What AI helped with |
 |---|---|
@@ -17,10 +17,10 @@ Several parts of this project were built with AI assistance (Claude by Anthropic
 
 ## Video Demo
 
-[PART 2 - Watch the demo on YouTube](https://youtu.be/lt0lGFa9MV8)
-[PART 3 - Watch the demo on YouTube](https://youtu.be/XXX)
+- [PART 2 - Watch the demo on YouTube](https://youtu.be/lt0lGFa9MV8)
+- [PART 3 - Watch the demo on YouTube](https://youtu.be/8aJppz6cCps)
 
-> The video walks through all app features with a voice-over explaining the implementation.
+> These videos walks through all app features with a voice-over explaining the implementation.
 
 ## APK Download
 
@@ -45,7 +45,7 @@ budgetbuddy/
 
 ## Android App
 
-### Features
+### Android Features
 
 | Feature | Description |
 |---|---|
@@ -151,7 +151,7 @@ Place `google-services.json` in `android/app/` before building.
 
 ## Web Admin Panel & REST API
 
-### Features
+### Web Features
 
 | Feature | Description |
 |---|---|
