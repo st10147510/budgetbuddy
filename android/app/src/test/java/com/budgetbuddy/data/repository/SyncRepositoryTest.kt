@@ -133,7 +133,10 @@ class SyncRepositoryTest {
         whenever(categoryDao.getNonDefaultCategories()).thenReturn(emptyList())
         whenever(badgeDao.getAllBadgesOnce("u1")).thenReturn(emptyList())
 
-        repository.syncToFirestore("u1")
+        // All entity types are attempted; exception is thrown after all operations complete
+        org.junit.Assert.assertThrows(Exception::class.java) {
+            kotlinx.coroutines.runBlocking { repository.syncToFirestore("u1") }
+        }
 
         verify(firestoreRepository, never()).saveTransaction(any(), any())
         verify(firestoreRepository).saveBudget("u1", budget)
@@ -148,8 +151,10 @@ class SyncRepositoryTest {
         whenever(firestoreRepository.getCategories("u1")).thenReturn(emptyList())
         whenever(firestoreRepository.getBadges("u1")).thenReturn(emptyList())
 
-        // Should not throw — partial failures are swallowed per SyncRepository contract
-        repository.syncFromFirestore("u1")
+        // All entity types are attempted; exception is thrown after all operations complete
+        org.junit.Assert.assertThrows(Exception::class.java) {
+            kotlinx.coroutines.runBlocking { repository.syncFromFirestore("u1") }
+        }
 
         verify(transactionDao, never()).insertTransaction(any())
         // remaining collections still attempted

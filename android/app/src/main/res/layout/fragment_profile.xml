@@ -152,7 +152,8 @@
             android:text="@string/sync_to_cloud"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="@color/background"
+            app:backgroundTint="@color/teal_accent"
             app:cornerRadius="28dp"/>
 
         <com.google.android.material.button.MaterialButton

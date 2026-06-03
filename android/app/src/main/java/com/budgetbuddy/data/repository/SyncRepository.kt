@@ -24,9 +24,11 @@ class SyncRepository @Inject constructor(
 ) {
     /**
      * Pushes all local Room data to Firestore.
-     * Called on sign-in to upload data that was saved while Firestore writes were unavailable.
+     * All entity types are attempted independently (partial-failure tolerance).
+     * Throws after all operations if any entity failed, so the caller can surface the error.
      */
     suspend fun syncToFirestore(userId: String) {
+        val failed = mutableListOf<String>()
         try {
             transactionDao.getAllTransactionsOnce(userId).forEach {
                 firestoreRepository.saveTransaction(userId, it)
@@ -34,6 +36,7 @@ class SyncRepository @Inject constructor(
             Log.d(TAG, "pushed transactions for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "transaction push failed: ${e.message}")
+            failed += "transactions"
         }
         try {
             budgetDao.getAllBudgetsOnce(userId).forEach {
@@ -42,6 +45,7 @@ class SyncRepository @Inject constructor(
             Log.d(TAG, "pushed budgets for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "budget push failed: ${e.message}")
+            failed += "budgets"
         }
         try {
             goalDao.getAllGoalsOnce(userId).forEach {
@@ -50,6 +54,7 @@ class SyncRepository @Inject constructor(
             Log.d(TAG, "pushed goals for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "goal push failed: ${e.message}")
+            failed += "goals"
         }
         try {
             debtDao.getAllDebtsOnce(userId).forEach {
@@ -58,6 +63,7 @@ class SyncRepository @Inject constructor(
             Log.d(TAG, "pushed debts for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "debt push failed: ${e.message}")
+            failed += "debts"
         }
         try {
             categoryDao.getNonDefaultCategories().forEach {
@@ -66,6 +72,7 @@ class SyncRepository @Inject constructor(
             Log.d(TAG, "pushed categories for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "category push failed: ${e.message}")
+            failed += "categories"
         }
         try {
             badgeDao.getAllBadgesOnce(userId).forEach {
@@ -74,49 +81,60 @@ class SyncRepository @Inject constructor(
             Log.d(TAG, "pushed badges for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "badge push failed: ${e.message}")
+            failed += "badges"
         }
+        if (failed.isNotEmpty()) throw Exception("Upload failed for: ${failed.joinToString()}")
     }
 
     /**
      * Pulls all user data from Firestore and upserts into Room.
-     * Safe to call on every sign-in — all target DAOs use REPLACE strategy.
+     * All entity types are attempted independently (partial-failure tolerance).
+     * Throws after all operations if any entity failed.
      */
     suspend fun syncFromFirestore(userId: String) {
+        val failed = mutableListOf<String>()
         try {
             firestoreRepository.getTransactions(userId).forEach { transactionDao.insertTransaction(it) }
             Log.d(TAG, "synced transactions for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "transaction sync failed: ${e.message}")
+            failed += "transactions"
         }
         try {
             firestoreRepository.getBudgets(userId).forEach { budgetDao.insertOrUpdateBudget(it) }
             Log.d(TAG, "synced budgets for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "budget sync failed: ${e.message}")
+            failed += "budgets"
         }
         try {
             firestoreRepository.getGoals(userId).forEach { goalDao.insertGoal(it) }
             Log.d(TAG, "synced goals for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "goal sync failed: ${e.message}")
+            failed += "goals"
         }
         try {
             firestoreRepository.getDebts(userId).forEach { debtDao.insertDebt(it) }
             Log.d(TAG, "synced debts for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "debt sync failed: ${e.message}")
+            failed += "debts"
         }
         try {
             firestoreRepository.getCategories(userId).forEach { categoryDao.insertCategory(it) }
             Log.d(TAG, "synced categories for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "category sync failed: ${e.message}")
+            failed += "categories"
         }
         try {
             firestoreRepository.getBadges(userId).forEach { badgeDao.insertBadge(it) }
             Log.d(TAG, "synced badges for $userId")
         } catch (e: Exception) {
             Log.w(TAG, "badge sync failed: ${e.message}")
+            failed += "badges"
         }
+        if (failed.isNotEmpty()) throw Exception("Download failed for: ${failed.joinToString()}")
     }
 }

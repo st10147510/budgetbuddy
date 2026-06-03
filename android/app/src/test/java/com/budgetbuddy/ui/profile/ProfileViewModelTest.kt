@@ -96,10 +96,11 @@ class ProfileViewModelTest {
 
         assertEquals(ProfileUiState.SyncSuccess, viewModel.uiState.value)
         verify(syncRepository).syncToFirestore("user1")
+        verify(syncRepository).syncFromFirestore("user1")
     }
 
     @Test
-    fun `syncToCloud emits Error when sync throws`() = runTest {
+    fun `syncToCloud emits Error when push throws`() = runTest {
         whenever(syncRepository.syncToFirestore("user1")).thenThrow(RuntimeException("network error"))
 
         viewModel.syncToCloud()
@@ -108,6 +109,19 @@ class ProfileViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state is ProfileUiState.Error)
         assertEquals("network error", (state as ProfileUiState.Error).message)
+        verify(syncRepository, never()).syncFromFirestore(any())
+    }
+
+    @Test
+    fun `syncToCloud emits Error when pull throws`() = runTest {
+        whenever(syncRepository.syncFromFirestore("user1")).thenThrow(RuntimeException("pull failed"))
+
+        viewModel.syncToCloud()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ProfileUiState.Error)
+        assertEquals("pull failed", (state as ProfileUiState.Error).message)
     }
 
     @Test
@@ -118,6 +132,7 @@ class ProfileViewModelTest {
         advanceUntilIdle()
 
         verify(syncRepository, never()).syncToFirestore(any())
+        verify(syncRepository, never()).syncFromFirestore(any())
         assertEquals(ProfileUiState.Idle, viewModel.uiState.value)
     }
 

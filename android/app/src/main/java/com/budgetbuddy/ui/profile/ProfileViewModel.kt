@@ -56,6 +56,7 @@ class ProfileViewModel @Inject constructor(
             _uiState.value = ProfileUiState.Syncing
             try {
                 syncRepository.syncToFirestore(userId)
+                syncRepository.syncFromFirestore(userId)
                 _uiState.value = ProfileUiState.SyncSuccess
             } catch (e: Exception) {
                 _uiState.value = ProfileUiState.Error(e.message ?: "Sync failed")
