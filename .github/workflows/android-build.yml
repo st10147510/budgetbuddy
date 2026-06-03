@@ -46,6 +46,7 @@ jobs:
         run: chmod +x ./gradlew
 
       # ── Tests ────────────────────────────────────────────────────────────────
+      # - name: Run unit tests
       #   run: ./gradlew test
 
       # ── Debug APK (always built, no signing required) ────────────────────────
